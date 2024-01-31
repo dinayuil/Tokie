@@ -59,7 +59,7 @@
       <string>PushButton</string>
      </property>
     </widget>
-    <widget class="QListView" name="allListsView">
+    <widget class="QListView" name="listNamesView">
      <property name="geometry">
       <rect>
        <x>10</x>

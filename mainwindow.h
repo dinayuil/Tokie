@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
+#include <QStringListModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,10 +15,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    QStandardItemModel* m_model;
-    QItemSelectionModel* m_selectionModel;
+    QStandardItemModel* m_itemModel;
+    QItemSelectionModel* m_itemSelcModel;
+    QStringListModel* m_listNamesModel;
+    QList<QString> m_allListNames;
+    QHash<QString, QStandardItemModel> m_nameToListMap;
 
     void initConnect();
+    void initLists();
 
 private slots:
     void onAddButtonClicked();
@@ -28,5 +33,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
 };
 #endif // MAINWINDOW_H

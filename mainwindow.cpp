@@ -13,8 +13,20 @@ void MainWindow::onAddButtonClicked()
     {
         QStandardItem* item = new QStandardItem(newTodo);
         item->setCheckable(true);
-        m_model->appendRow(item);
+        m_itemModel->appendRow(item);
         ui->newTodoEdit->clear();
+    }
+}
+
+void MainWindow::initLists()
+{
+    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
+    m_listNamesModel->setStringList(m_allListNames);
+    for(int i = 0; i < 15; i++)
+    {
+        QStandardItem* item = new QStandardItem(QString::number(i));
+        item->setCheckable(true);
+        m_itemModel->appendRow(item);
     }
 }
 
@@ -23,14 +35,20 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->setupUi(this);
-    m_model = new QStandardItemModel(this);
-    m_model->setColumnCount(1);
-    m_selectionModel = new QItemSelectionModel(m_model, this);
-    ui->todoListView->setModel(m_model);
-    ui->todoListView->setSelectionModel(m_selectionModel);
+
+    // todoListView
+    m_itemModel = new QStandardItemModel(this);
+    m_itemModel->setColumnCount(1);
+    m_itemSelcModel = new QItemSelectionModel(m_itemModel, this);
+    ui->todoListView->setModel(m_itemModel);
+    ui->todoListView->setSelectionModel(m_itemSelcModel);
+
+    // listNamesView
+    m_listNamesModel = new QStringListModel(this);
+    ui->listNamesView->setModel(m_listNamesModel);
 
     initConnect();
+    initLists();
 }
 
 MainWindow::~MainWindow()
