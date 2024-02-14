@@ -1,3 +1,6 @@
+# Doing
+多个todo列表
+
 # functional requirements
 [x] 向添加item
 [] 勾选item后item移动到已完成
@@ -10,6 +13,7 @@
 [] 云同步
 [] 添加列表
 [] 删除列表
+[] item设置重复间隔
 
 # non-functional requirements
 [] 可折叠已完成items

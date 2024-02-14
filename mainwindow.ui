@@ -26,48 +26,61 @@
     <property name="title">
      <string>GroupBox</string>
     </property>
-    <widget class="QListView" name="todoListView">
-     <property name="geometry">
-      <rect>
-       <x>275</x>
-       <y>180</y>
-       <width>221</width>
-       <height>192</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="newTodoEdit">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>140</y>
-       <width>113</width>
-       <height>24</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="addBtn">
-     <property name="geometry">
-      <rect>
-       <x>410</x>
-       <y>140</y>
-       <width>93</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
     <widget class="QListView" name="listNamesView">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
-       <width>256</width>
+       <y>160</y>
+       <width>171</width>
        <height>192</height>
       </rect>
      </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>50</y>
+       <width>311</width>
+       <height>331</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <widget class="QLineEdit" name="newTodoEdit">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>60</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="addBtn">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>60</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+     <widget class="QListView" name="todoListView">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>221</width>
+        <height>192</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -77,7 +90,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

@@ -4,6 +4,8 @@
 void MainWindow::initConnect()
 {
     connect(ui->addBtn, SIGNAL(clicked()), this, SLOT(onAddButtonClicked())) ;
+    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
 }
 
 void MainWindow::onAddButtonClicked()
@@ -18,16 +20,55 @@ void MainWindow::onAddButtonClicked()
     }
 }
 
+void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
+{
+    QModelIndexList selectedIndexes = selected.indexes();
+    for(int i = 0; i < selectedIndexes.size(); i++)
+    {
+
+        qDebug() << m_listNamesModel->data(selectedIndexes[i]).toString();
+
+        m_itemModel = m_nameToListMap[m_listNamesModel->data(selectedIndexes[i]).toString()];
+        ui->todoListView->setModel(m_itemModel);
+
+        m_itemSelcModel->setModel(m_itemModel);
+        ui->todoListView->setSelectionModel(m_itemSelcModel);
+    }
+}
+
+void MainWindow::onItemSelcChanged(const QItemSelection &selected)
+{
+    QModelIndexList selectedIndexes = selected.indexes();
+    for(int i = 0; i < selectedIndexes.size(); i++)
+    {
+        qDebug() << m_itemModel->data(selectedIndexes[i]).toString();
+    }
+}
+
 void MainWindow::initLists()
 {
+    // to keep the order of names  a separate list is needed, hash or map both changes the order
     m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
-    m_listNamesModel->setStringList(m_allListNames);
+    for(const auto& name: m_allListNames)
+    {
+        m_nameToListMap[name] = new QStandardItemModel(this);
+        m_nameToListMap[name]->setColumnCount(1);
+    }
+
+    for(const auto& name: m_allListNames)
+    {
+        QStandardItem* item = new QStandardItem(name);
+        m_listNamesModel->appendRow(item);
+    }
+
+
     for(int i = 0; i < 15; i++)
     {
         QStandardItem* item = new QStandardItem(QString::number(i));
         item->setCheckable(true);
         m_itemModel->appendRow(item);
     }
+
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -44,8 +85,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->todoListView->setSelectionModel(m_itemSelcModel);
 
     // listNamesView
-    m_listNamesModel = new QStringListModel(this);
+    m_listNamesModel = new QStandardItemModel(this);
+    m_listNamesModel->setColumnCount(1);
+    m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
     ui->listNamesView->setModel(m_listNamesModel);
+    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
     initConnect();
     initLists();

@@ -17,15 +17,18 @@ class MainWindow : public QMainWindow
 private:
     QStandardItemModel* m_itemModel;
     QItemSelectionModel* m_itemSelcModel;
-    QStringListModel* m_listNamesModel;
+    QStandardItemModel* m_listNamesModel;
+    QItemSelectionModel* m_listNameSelcModel;
     QList<QString> m_allListNames;
-    QHash<QString, QStandardItemModel> m_nameToListMap;
+    QHash<QString, QStandardItemModel*> m_nameToListMap;
 
     void initConnect();
     void initLists();
 
 private slots:
     void onAddButtonClicked();
+    void onListNameSelcChanged(const QItemSelection &selected);
+    void onItemSelcChanged(const QItemSelection &selected);
 
 public:
     MainWindow(QWidget *parent = nullptr);
