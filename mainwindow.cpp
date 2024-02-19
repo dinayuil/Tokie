@@ -6,6 +6,8 @@ void MainWindow::initConnect()
     connect(ui->addBtn, SIGNAL(clicked()), this, SLOT(onAddButtonClicked())) ;
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
+    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickItem()));
+    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
 }
 
 void MainWindow::onAddButtonClicked()
@@ -47,8 +49,16 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onActDeleteItem()
 {
-    m_itemSelcModel->currentIndex();
+    int currentRow = m_itemSelcModel->currentIndex().row();
+    m_itemModel->removeRow(currentRow); // this will release the memory, no need to use `delete`
+}
 
+void MainWindow::onRightClickItem()
+{
+    QMenu* menuList= new QMenu(this);
+    menuList->addAction(ui->actionDeleteItem);
+    menuList->exec(QCursor::pos());
+    delete menuList;
 }
 
 void MainWindow::initLists()
@@ -68,7 +78,7 @@ void MainWindow::initLists()
     }
 
 
-    for(int i = 0; i < 15; i++)
+    for(long i = 0; i < 15; i++)
     {
         QStandardItem* item = new QStandardItem(QString::number(i));
         item->setCheckable(true);
@@ -82,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // todoListView
     m_itemModel = new QStandardItemModel(this);

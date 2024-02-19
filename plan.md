@@ -1,9 +1,9 @@
 # Doing
-删除item
+添加列表
 
 # functional requirements
 [x] 向添加item
-[] 删除item
+[x] 删除item
 [] 持久化数据
 [x] 多个todo列表
 [] item可设置时间、日期
