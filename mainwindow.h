@@ -29,6 +29,7 @@ private slots:
     void onAddButtonClicked();
     void onListNameSelcChanged(const QItemSelection &selected);
     void onItemSelcChanged(const QItemSelection &selected);
+    void onActDeleteItem();
 
 public:
     MainWindow(QWidget *parent = nullptr);

@@ -45,9 +45,15 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     }
 }
 
+void MainWindow::onActDeleteItem()
+{
+    m_itemSelcModel->currentIndex();
+
+}
+
 void MainWindow::initLists()
 {
-    // to keep the order of names  a separate list is needed, hash or map both changes the order
+    // to keep the order of names  a separate list is needed, hash or map both change the order
     m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
     for(const auto& name: m_allListNames)
     {
