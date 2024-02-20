@@ -1,16 +1,19 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QInputDialog>
+#include <QMessageBox>
 
 void MainWindow::initConnect()
 {
-    connect(ui->addBtn, SIGNAL(clicked()), this, SLOT(onAddButtonClicked())) ;
+    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddButtonClicked())) ;
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickItem()));
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
 }
 
-void MainWindow::onAddButtonClicked()
+void MainWindow::onAddItemBtnClicked()
 {
     QString newTodo = ui->newTodoEdit->text();
     if(!newTodo.isEmpty())
@@ -61,10 +64,48 @@ void MainWindow::onRightClickItem()
     delete menuList;
 }
 
+void MainWindow::onAddListBtnClicked()
+{
+    bool validName = false;
+    QString dlgTitle= "Input a list name";
+    QString txtLabel= "List name";
+    QString listName = "Unnamed list";
+    while(!validName)
+    {
+        bool ok= false;
+        listName = QInputDialog::getText(this, dlgTitle, txtLabel, QLineEdit::Normal, listName, &ok);
+        if(!ok)
+        {
+            break;
+        }
+        if (ok && !listName.isEmpty())
+        {
+            if(!m_nameToListMap.contains(listName))
+            {
+                validName = true;
+            }
+            else
+            {
+                QMessageBox::critical(this, "Invalid name", "List name already exists.");
+            }
+        }
+    }
+
+    if(validName)
+    {
+        m_allListNames.append(listName);
+        QStandardItem* item = new QStandardItem(listName);
+        m_listNamesModel->appendRow(item);
+        m_nameToListMap[listName] = new QStandardItemModel(this);
+        m_nameToListMap[listName]->setColumnCount(1);
+    }
+
+}
+
 void MainWindow::initLists()
 {
     // to keep the order of names  a separate list is needed, hash or map both change the order
-    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
+    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";   // 只用model存是不是也可以，这个list可能可以省掉？
     for(const auto& name: m_allListNames)
     {
         m_nameToListMap[name] = new QStandardItemModel(this);

@@ -1,5 +1,5 @@
 # Doing
-添加列表
+删除列表
 
 # functional requirements
 [x] 向添加item
@@ -10,7 +10,7 @@
 [] 列表下显示已完成选items
 [] item可被移动到另一个列表
 [] 云同步
-[] 添加列表
+[x] 添加列表
 [] 删除列表
 [] item设置重复间隔
 

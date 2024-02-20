@@ -58,7 +58,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="addBtn">
+     <widget class="QPushButton" name="addItemBtn">
       <property name="geometry">
        <rect>
         <x>180</x>
@@ -68,7 +68,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>Add item</string>
       </property>
      </widget>
      <widget class="QListView" name="todoListView">
@@ -163,6 +163,19 @@
        <string>Comment</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QPushButton" name="addListBtn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>360</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add list</string>
+     </property>
     </widget>
    </widget>
   </widget>

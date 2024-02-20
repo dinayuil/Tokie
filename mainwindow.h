@@ -26,11 +26,12 @@ private:
     void initLists();
 
 private slots:
-    void onAddButtonClicked();
+    void onAddItemBtnClicked();
     void onListNameSelcChanged(const QItemSelection &selected);
     void onItemSelcChanged(const QItemSelection &selected);
     void onActDeleteItem();
     void onRightClickItem();
+    void onAddListBtnClicked();
 
 public:
     MainWindow(QWidget *parent = nullptr);
