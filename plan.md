@@ -4,6 +4,7 @@
 # functional requirements
 [x] 向添加item
 [x] 删除item
+[] 重命名item
 [] 持久化数据
 [x] 多个todo列表
 [] item可设置时间、日期
@@ -12,6 +13,7 @@
 [] 云同步
 [x] 添加列表
 [] 删除列表
+[] 重命名列表
 [] item设置重复间隔
 
 # non-functional requirements
