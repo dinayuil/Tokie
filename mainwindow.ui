@@ -198,6 +198,14 @@
     <enum>QAction::NoRole</enum>
    </property>
   </action>
+  <action name="actionDeleteList">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
