@@ -5,15 +5,19 @@
 
 void MainWindow::initConnect()
 {
-    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked())) ;
-    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+    /* todo list */
+    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
     connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
-
-    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
-
     // todo list right click menu
     connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickItem()));
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+
+    /* lists of todo list*/
+    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
+    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+    // lists right click menu
+    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
+    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -113,10 +117,37 @@ void MainWindow::onAddListBtnClicked()
 
 }
 
+void MainWindow::onRightClickListName()
+{
+    QMenu* menuList= new QMenu(this);
+    menuList->addAction(ui->actionDeleteList);
+    if(!m_listNameSelcModel->currentIndex().isValid())
+    {
+        ui->actionDeleteList->setEnabled(false);
+    }
+    else
+    {
+        ui->actionDeleteList->setEnabled(true);
+    }
+    menuList->exec(QCursor::pos());
+    delete menuList;
+}
+
+void MainWindow::onActDeleteList()
+{
+    int currentRow = m_listNameSelcModel->currentIndex().row();
+    QStandardItem* listNameItem = m_listNamesModel->item(currentRow);
+    QStandardItemModel* todoItemModel = m_nameToListMap[listNameItem->text()];
+    delete todoItemModel;   // call the model's destructor, and also destroys all its items
+    m_nameToListMap.remove(listNameItem->text());
+    m_listNamesModel->removeRow(currentRow);
+}
+
 void MainWindow::initLists()
 {
+    // TODO: 用model也可以存取列表名字，这个list可以去掉
     // to keep the order of names  a separate list is needed, hash or map both change the order
-    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";   // 只用model存是不是也可以，这个list可能可以省掉？
+    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
     for(const auto& name: m_allListNames)
     {
         m_nameToListMap[name] = new QStandardItemModel(this);
@@ -145,6 +176,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // todoListView
     m_itemModel = new QStandardItemModel(this);

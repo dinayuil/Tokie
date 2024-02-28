@@ -32,6 +32,8 @@ private slots:
     void onActDeleteItem();
     void onRightClickItem();
     void onAddListBtnClicked();
+    void onRightClickListName();
+    void onActDeleteList();
 
 public:
     MainWindow(QWidget *parent = nullptr);
