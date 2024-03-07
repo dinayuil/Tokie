@@ -108,7 +108,6 @@ void MainWindow::onAddListBtnClicked()
 
     if(validName)
     {
-        m_allListNames.append(listName);
         QStandardItem* item = new QStandardItem(listName);
         m_listNamesModel->appendRow(item);
         m_nameToListMap[listName] = new QStandardItemModel(this);
@@ -145,16 +144,16 @@ void MainWindow::onActDeleteList()
 
 void MainWindow::initLists()
 {
-    // TODO: 用model也可以存取列表名字，这个list可以去掉
-    // to keep the order of names  a separate list is needed, hash or map both change the order
-    m_allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
-    for(const auto& name: m_allListNames)
+    // in the future they should be loaded from disk
+    QList<QString> allListNames;
+    allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
+    for(const auto& name: allListNames)
     {
         m_nameToListMap[name] = new QStandardItemModel(this);
         m_nameToListMap[name]->setColumnCount(1);
     }
 
-    for(const auto& name: m_allListNames)
+    for(const auto& name: allListNames)
     {
         QStandardItem* item = new QStandardItem(name);
         m_listNamesModel->appendRow(item);

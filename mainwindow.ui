@@ -17,10 +17,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>90</y>
-      <width>671</width>
-      <height>411</height>
+      <x>10</x>
+      <y>10</y>
+      <width>781</width>
+      <height>511</height>
      </rect>
     </property>
     <property name="title">
@@ -35,14 +35,17 @@
        <height>192</height>
       </rect>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>50</y>
+       <y>20</y>
        <width>291</width>
-       <height>331</height>
+       <height>461</height>
       </rect>
      </property>
      <property name="title">
@@ -52,7 +55,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>60</y>
+        <y>420</y>
         <width>113</width>
         <height>24</height>
        </rect>
@@ -62,7 +65,7 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>60</y>
+        <y>420</y>
         <width>93</width>
         <height>28</height>
        </rect>
@@ -80,15 +83,31 @@
         <height>192</height>
        </rect>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="listNameLabel">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>60</y>
+        <width>69</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
      </widget>
     </widget>
     <widget class="QGroupBox" name="itemDetailsBox">
      <property name="geometry">
       <rect>
        <x>510</x>
-       <y>50</y>
-       <width>151</width>
-       <height>331</height>
+       <y>20</y>
+       <width>211</width>
+       <height>461</height>
       </rect>
      </property>
      <property name="title">
@@ -98,9 +117,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>240</y>
-        <width>104</width>
-        <height>71</height>
+        <y>340</y>
+        <width>181</width>
+        <height>101</height>
        </rect>
       </property>
      </widget>
@@ -108,7 +127,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
+        <y>270</y>
         <width>110</width>
         <height>22</height>
        </rect>
@@ -118,7 +137,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>190</y>
         <width>101</width>
         <height>19</height>
        </rect>
@@ -131,7 +150,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>210</y>
         <width>131</width>
         <height>22</height>
        </rect>
@@ -141,7 +160,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>150</y>
+        <y>250</y>
         <width>80</width>
         <height>19</height>
        </rect>
@@ -150,17 +169,27 @@
        <string>Set due</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="itemCommentLabel">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>220</y>
-        <width>61</width>
+        <y>320</y>
+        <width>81</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>Comment</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="itemNameLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -185,7 +214,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

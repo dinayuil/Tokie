@@ -19,7 +19,6 @@ private:
     QItemSelectionModel* m_itemSelcModel;
     QStandardItemModel* m_listNamesModel;
     QItemSelectionModel* m_listNameSelcModel;
-    QList<QString> m_allListNames;
     QHash<QString, QStandardItemModel*> m_nameToListMap;
 
     void initConnect();
