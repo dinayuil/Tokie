@@ -23,6 +23,9 @@ private:
 
     void initConnect();
     void initLists();
+    void enableTaskDetailsUi();
+    void disableTaskDetailsUi();
+    void clearTaskDetailsUiContent();
 
 private slots:
     void onAddItemBtnClicked();
@@ -33,6 +36,8 @@ private slots:
     void onAddListBtnClicked();
     void onRightClickListName();
     void onActDeleteList();
+    void onTaskReminderChkBoxToggled(bool checked);
+    void onTaskDueChkBoxToggled(bool checked);
 
 public:
     MainWindow(QWidget *parent = nullptr);

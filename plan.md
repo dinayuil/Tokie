@@ -15,6 +15,7 @@ item可设置时间、日期
 [x] 删除列表
 [] 重命名列表
 [] item设置重复间隔
+[] 点击list内没有task的地方应该deselect（如果之前有selected task）
 
 # non-functional requirements
 [] 勾选item后item移动到已完成

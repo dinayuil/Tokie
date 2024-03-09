@@ -113,7 +113,7 @@
      <property name="title">
       <string>GroupBox</string>
      </property>
-     <widget class="QTextEdit" name="itemComment">
+     <widget class="QTextEdit" name="taskCommentTextEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -123,7 +123,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QDateEdit" name="dateEdit">
+     <widget class="QDateEdit" name="taskDueDateEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -132,13 +132,16 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
      </widget>
-     <widget class="QCheckBox" name="remindChkBox">
+     <widget class="QCheckBox" name="taskReminderChkBox">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>190</y>
-        <width>101</width>
+        <width>121</width>
         <height>19</height>
        </rect>
       </property>
@@ -146,7 +149,7 @@
        <string>Set reminder</string>
       </property>
      </widget>
-     <widget class="QDateTimeEdit" name="dateTimeEdit">
+     <widget class="QDateTimeEdit" name="taskReminderDateTimeEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -155,8 +158,11 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
      </widget>
-     <widget class="QCheckBox" name="dueChkBox">
+     <widget class="QCheckBox" name="taskDueChkBox">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -169,7 +175,7 @@
        <string>Set due</string>
       </property>
      </widget>
-     <widget class="QLabel" name="itemCommentLabel">
+     <widget class="QLabel" name="taskCommentLabel">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -182,7 +188,7 @@
        <string>Comment</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="itemNameLineEdit">
+     <widget class="QLineEdit" name="taskNameLineEdit">
       <property name="geometry">
        <rect>
         <x>10</x>

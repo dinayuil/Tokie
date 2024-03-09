@@ -7,11 +7,17 @@ void MainWindow::initConnect()
 {
     /* todo list */
     connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
-    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
+//    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
     connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickItem()));
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+    // todo list item selection
+    connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(onItemSelcChanged(QItemSelection)));
 
+    /* Task details UI */
+    connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
+    connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
     /* lists of todo list*/
     connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
@@ -50,7 +56,16 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 {
+    if(selected.empty())
+    {
+        disableTaskDetailsUi();
+    }
+    else
+    {
+        enableTaskDetailsUi();
+    }
     QModelIndexList selectedIndexes = selected.indexes();
+
     for(int i = 0; i < selectedIndexes.size(); i++)
     {
         qDebug() << m_itemModel->data(selectedIndexes[i]).toString();
@@ -142,6 +157,16 @@ void MainWindow::onActDeleteList()
     m_listNamesModel->removeRow(currentRow);
 }
 
+void MainWindow::onTaskReminderChkBoxToggled(bool checked)
+{
+    ui->taskReminderDateTimeEdit->setEnabled(checked);
+}
+
+void MainWindow::onTaskDueChkBoxToggled(bool checked)
+{
+    ui->taskDueChkBox->setEnabled(checked);
+}
+
 void MainWindow::initLists()
 {
     // in the future they should be loaded from disk
@@ -169,6 +194,36 @@ void MainWindow::initLists()
 
 }
 
+void MainWindow::enableTaskDetailsUi()
+{
+    ui->taskNameLineEdit->setEnabled(true);
+    ui->taskReminderChkBox->setEnabled(true);
+    ui->taskReminderDateTimeEdit->setEnabled(ui->taskReminderChkBox->isChecked());
+    ui->taskDueChkBox->setEnabled(true);
+    ui->taskDueDateEdit->setEnabled(ui->taskReminderChkBox->isChecked());
+    ui->taskCommentTextEdit->setEnabled(true);
+}
+
+void MainWindow::disableTaskDetailsUi()
+{
+    ui->taskNameLineEdit->setEnabled(false);
+    ui->taskReminderChkBox->setEnabled(false);
+    ui->taskReminderDateTimeEdit->setEnabled(false);
+    ui->taskDueChkBox->setEnabled(false);
+    ui->taskDueDateEdit->setEnabled(false);
+    ui->taskCommentTextEdit->setEnabled(false);
+}
+
+void MainWindow::clearTaskDetailsUiContent()
+{
+    ui->taskNameLineEdit->clear();
+    ui->taskReminderChkBox->setCheckState(Qt::Unchecked);
+    ui->taskReminderDateTimeEdit->clear();
+    ui->taskDueChkBox->setCheckState(Qt::Unchecked);
+    ui->taskDueDateEdit->clear();
+    ui->taskCommentTextEdit->clear();
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -193,6 +248,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     initConnect();
     initLists();
+    disableTaskDetailsUi();
+    clearTaskDetailsUiContent();
 }
 
 MainWindow::~MainWindow()
