@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include <QInputDialog>
 #include <QMessageBox>
+#include "task.h"
 
 void MainWindow::initConnect()
 {
@@ -32,6 +33,10 @@ void MainWindow::onAddItemBtnClicked()
     if(!newTodo.isEmpty())
     {
         QStandardItem* item = new QStandardItem(newTodo);
+        Task* task = new Task(newTodo);     // TODO: how to delete, manually, smart pointer or use QObject ?
+        QVariant variant;
+        variant.setValue(task);
+        item->setData(variant);
         item->setCheckable(true);
         m_itemModel->appendRow(item);
         ui->newTodoEdit->clear();
@@ -65,6 +70,14 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         enableTaskDetailsUi();
     }
     QModelIndexList selectedIndexes = selected.indexes();
+    if(!selectedIndexes.empty())
+    {
+        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
+        enableTaskDetailsUi();
+        ui->taskNameLineEdit->setText(task->name());
+        qDebug() << task->name();
+    }
+
 
     for(int i = 0; i < selectedIndexes.size(); i++)
     {

@@ -7,15 +7,19 @@
 class Task
 {
 public:
-    Task();
+    Task(QString name);
+
+    QString name() const;
 
 private:
-    bool m_enableReminder;
+    bool m_enableReminder = false;
     QDateTime m_reminder;
-    bool m_enableDue;
+    bool m_enableDue = false;
     QDate m_due;
-    QString m_comment;
+    QString m_comment = "";
     QString m_name;
 };
+
+Q_DECLARE_METATYPE(Task *);
 
 #endif // TASK_H
