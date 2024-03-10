@@ -17,7 +17,6 @@ void MainWindow::initConnect()
             this, SLOT(onItemSelcChanged(QItemSelection)));
 
     /* Task details UI */
-    connect(ui->taskNameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(onTaskNameLineEditEditing()));
     connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
@@ -66,14 +65,6 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 {
-//    if(selected.empty())
-//    {
-//        disableTaskDetailsUi();
-//    }
-//    else
-//    {
-//        enableTaskDetailsUi();
-//    }
     QModelIndexList selectedIndexes = selected.indexes();
     if(selectedIndexes.empty())
     {
@@ -213,11 +204,6 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
     }
 }
 
-void MainWindow::onTaskNameLineEditEditing()
-{
-//    setBeingModifiedItem();
-}
-
 void MainWindow::onTaskNameLineEditFinished()
 {
     QModelIndexList indexes = m_itemSelcModel->selectedIndexes();   // this will still get the index for the item that is being modified, not the next selected item
@@ -318,17 +304,6 @@ void MainWindow::clearTaskDetailsUiContent()
     ui->taskDueDateEdit->clear();
     ui->taskCommentTextEdit->clear();
 }
-
-
-//void MainWindow::setBeingModifiedItem()
-//{
-//    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-//    if(!indexes.empty())
-//    {
-//        m_beingModifiedItem = m_itemModel->itemFromIndex(indexes[0]);
-//        qDebug() << "onTaskNameLineEditEditing: " << m_beingModifiedItem->data(Qt::DisplayRole);
-//    }
-//}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

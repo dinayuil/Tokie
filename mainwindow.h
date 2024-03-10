@@ -27,7 +27,6 @@ private:
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
     void clearTaskDetailsUiContent();
-//    void setBeingModifiedItem();
     QStandardItem* beingModifiedItem();
 
 private slots:

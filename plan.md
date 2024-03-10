@@ -1,12 +1,12 @@
 # Doing
-item可设置时间、日期
+更换列表后应该丧失item的selection
 
 # functional requirements
 [x] 向添加item
 [x] 删除item
-[] 重命名item
+[x] 重命名item
 [x] 多个todo列表
-[] item可设置时间、日期
+[x] item可设置时间、日期
 [] 列表下显示已完成选items
 [] item可被移动到另一个列表
 [] 云同步
@@ -16,6 +16,7 @@ item可设置时间、日期
 [] item设置重复间隔
 [] 点击list内没有task的地方应该deselect（如果之前有selected task）
 [] 持久化数据、数据库存储
+[] 更换列表后应该丧失item的selection
 
 # non-functional requirements
 [] 勾选item后item移动到已完成
