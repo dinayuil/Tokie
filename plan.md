@@ -5,7 +5,6 @@ item可设置时间、日期
 [x] 向添加item
 [x] 删除item
 [] 重命名item
-[] 持久化数据
 [x] 多个todo列表
 [] item可设置时间、日期
 [] 列表下显示已完成选items
@@ -16,6 +15,7 @@ item可设置时间、日期
 [] 重命名列表
 [] item设置重复间隔
 [] 点击list内没有task的地方应该deselect（如果之前有selected task）
+[] 持久化数据、数据库存储
 
 # non-functional requirements
 [] 勾选item后item移动到已完成

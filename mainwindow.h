@@ -20,12 +20,15 @@ private:
     QStandardItemModel* m_listNamesModel;
     QItemSelectionModel* m_listNameSelcModel;
     QHash<QString, QStandardItemModel*> m_nameToListMap;
+    QStandardItem* m_beingModifiedItem = nullptr;
 
     void initConnect();
     void initLists();
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
     void clearTaskDetailsUiContent();
+//    void setBeingModifiedItem();
+    QStandardItem* beingModifiedItem();
 
 private slots:
     void onAddItemBtnClicked();
@@ -38,6 +41,10 @@ private slots:
     void onActDeleteList();
     void onTaskReminderChkBoxToggled(bool checked);
     void onTaskDueChkBoxToggled(bool checked);
+    void onTaskNameLineEditEditing();
+    void onTaskNameLineEditFinished();
+    void onTaskReminderDateTimeEditFinished();
+    void onTaskDueDateEditFinished();
 
 public:
     MainWindow(QWidget *parent = nullptr);

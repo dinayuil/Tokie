@@ -17,8 +17,13 @@ void MainWindow::initConnect()
             this, SLOT(onItemSelcChanged(QItemSelection)));
 
     /* Task details UI */
+    connect(ui->taskNameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(onTaskNameLineEditEditing()));
+    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
+    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
+    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
+
     /* lists of todo list*/
     connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
@@ -61,21 +66,37 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 {
-    if(selected.empty())
+//    if(selected.empty())
+//    {
+//        disableTaskDetailsUi();
+//    }
+//    else
+//    {
+//        enableTaskDetailsUi();
+//    }
+    QModelIndexList selectedIndexes = selected.indexes();
+    if(selectedIndexes.empty())
     {
         disableTaskDetailsUi();
     }
     else
     {
         enableTaskDetailsUi();
-    }
-    QModelIndexList selectedIndexes = selected.indexes();
-    if(!selectedIndexes.empty())
-    {
         Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
-        enableTaskDetailsUi();
         ui->taskNameLineEdit->setText(task->name());
-        qDebug() << task->name();
+        ui->taskReminderChkBox->setChecked(task->enableReminder());
+        if(task->enableReminder())
+        {
+            if(task->reminder().isValid()) ui->taskReminderDateTimeEdit->setDateTime(task->reminder());
+        }
+        ui->taskDueChkBox->setChecked(task->enableDue());
+        if(task->enableDue())
+        {
+            if(task->due().isValid()) ui->taskDueDateEdit->setDate(task->due());
+        }
+        ui->taskCommentTextEdit->setText(task->comment());
+
+        qDebug() << "onItemSelcChanged: task name: " << task->name();
     }
 
 
@@ -173,11 +194,72 @@ void MainWindow::onActDeleteList()
 void MainWindow::onTaskReminderChkBoxToggled(bool checked)
 {
     ui->taskReminderDateTimeEdit->setEnabled(checked);
+    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
+    if(!indexes.empty())
+    {
+        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+        task->setEnableReminder(checked);
+    }
 }
 
 void MainWindow::onTaskDueChkBoxToggled(bool checked)
 {
-    ui->taskDueChkBox->setEnabled(checked);
+    ui->taskDueDateEdit->setEnabled(checked);
+    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
+    if(!indexes.empty())
+    {
+        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+        task->setEnableDue(checked);
+    }
+}
+
+void MainWindow::onTaskNameLineEditEditing()
+{
+//    setBeingModifiedItem();
+}
+
+void MainWindow::onTaskNameLineEditFinished()
+{
+    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();   // this will still get the index for the item that is being modified, not the next selected item
+    if(!indexes.empty())
+    {
+        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+        QString newName = ui->taskNameLineEdit->text();
+        if(!newName.isEmpty())
+        {
+            task->setName(newName);
+            m_itemModel->setData(indexes[0], newName, Qt::DisplayRole);
+        }
+        qDebug() << "onTaskNameLineEditFinished: " << newName;
+    }
+}
+
+void MainWindow::onTaskReminderDateTimeEditFinished()
+{
+    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
+    if(!indexes.empty())
+    {
+        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+        QDateTime dateTime = ui->taskReminderDateTimeEdit->dateTime();
+        if(dateTime.isValid())
+        {
+            task->setReminder(dateTime);
+        }
+    }
+}
+
+void MainWindow::onTaskDueDateEditFinished()
+{
+    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
+    if(!indexes.empty())
+    {
+        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+        QDate date = ui->taskDueDateEdit->date();
+        if(date.isValid())
+        {
+            task->setDue(date);
+        }
+    }
 }
 
 void MainWindow::initLists()
@@ -236,6 +318,17 @@ void MainWindow::clearTaskDetailsUiContent()
     ui->taskDueDateEdit->clear();
     ui->taskCommentTextEdit->clear();
 }
+
+
+//void MainWindow::setBeingModifiedItem()
+//{
+//    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
+//    if(!indexes.empty())
+//    {
+//        m_beingModifiedItem = m_itemModel->itemFromIndex(indexes[0]);
+//        qDebug() << "onTaskNameLineEditEditing: " << m_beingModifiedItem->data(Qt::DisplayRole);
+//    }
+//}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

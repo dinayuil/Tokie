@@ -10,6 +10,22 @@ public:
     Task(QString name);
 
     QString name() const;
+    void setName(const QString &newName);
+
+    bool enableReminder() const;
+    void setEnableReminder(bool newEnableReminder);
+
+    bool enableDue() const;
+    void setEnableDue(bool newEnableDue);
+
+    QDateTime reminder() const;
+    void setReminder(const QDateTime &newReminder);
+
+    QDate due() const;
+    void setDue(const QDate &newDue);
+
+    QString comment() const;
+    void setComment(const QString &newComment);
 
 private:
     bool m_enableReminder = false;
