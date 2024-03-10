@@ -24,3 +24,4 @@
 [] 可多选item，批量删除、移动到另一个列表
 [] 删除前确认
 [] 拖动listname/item改变位置
+[] task列表里的task如果有reminder或者due，要增加显示
