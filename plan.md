@@ -1,5 +1,5 @@
 # Doing
-点击list内没有task的地方应该deselect（如果之前有selected task）
+持久化数据、数据库存储
 
 # functional requirements
 [x] 向添加item
@@ -14,7 +14,7 @@
 [x] 删除列表
 [] 重命名列表
 [] item设置重复间隔
-[] 点击list内没有task的地方应该deselect（如果之前有selected task）
+[x] 点击list内没有task的地方应该不出现contextMenu
 [] 持久化数据、数据库存储
 [x] 更换列表后task details disabled
 
@@ -25,3 +25,4 @@
 [] 删除前确认
 [] 拖动listname/item改变位置
 [] task列表里的task如果有reminder或者due，要增加显示
+[] item排序

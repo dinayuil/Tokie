@@ -10,7 +10,7 @@ void MainWindow::initConnect()
     connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
-    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickItem()));
+    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTodoList(QPoint)));
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
     // todo list item selection
     connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
@@ -105,20 +105,15 @@ void MainWindow::onActDeleteItem()
     m_itemModel->removeRow(currentRow); // this will release the memory, no need to use `delete`
 }
 
-void MainWindow::onRightClickItem()
+void MainWindow::onRightClickInTodoList(const QPoint &pos)
 {
-    QMenu* menuList= new QMenu(this);
-    menuList->addAction(ui->actionDeleteItem);
-    if(!m_itemSelcModel->currentIndex().isValid())
+    if(ui->todoListView->indexAt(pos).isValid())
     {
-        ui->actionDeleteItem->setEnabled(false);
+        QMenu* menuList= new QMenu(this);
+        menuList->addAction(ui->actionDeleteItem);
+        menuList->exec(QCursor::pos());
+        delete menuList;
     }
-    else
-    {
-        ui->actionDeleteItem->setEnabled(true);
-    }
-    menuList->exec(QCursor::pos());
-    delete menuList;
 }
 
 void MainWindow::onAddListBtnClicked()
