@@ -1,5 +1,5 @@
 # Doing
-更换列表后应该丧失item的selection
+点击list内没有task的地方应该deselect（如果之前有selected task）
 
 # functional requirements
 [x] 向添加item
@@ -16,7 +16,7 @@
 [] item设置重复间隔
 [] 点击list内没有task的地方应该deselect（如果之前有selected task）
 [] 持久化数据、数据库存储
-[] 更换列表后应该丧失item的selection
+[x] 更换列表后task details disabled
 
 # non-functional requirements
 [] 勾选item后item移动到已完成

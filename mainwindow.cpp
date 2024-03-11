@@ -60,6 +60,8 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 
         m_itemSelcModel->setModel(m_itemModel);
         ui->todoListView->setSelectionModel(m_itemSelcModel);
+
+        disableTaskDetailsUi();
     }
 }
 

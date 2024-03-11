@@ -40,7 +40,6 @@ private slots:
     void onActDeleteList();
     void onTaskReminderChkBoxToggled(bool checked);
     void onTaskDueChkBoxToggled(bool checked);
-    void onTaskNameLineEditEditing();
     void onTaskNameLineEditFinished();
     void onTaskReminderDateTimeEditFinished();
     void onTaskDueDateEditFinished();
