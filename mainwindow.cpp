@@ -2,6 +2,9 @@
 #include "./ui_mainwindow.h"
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFile>
+#include <QSqlDatabase>
+
 #include "task.h"
 
 void MainWindow::initConnect()
@@ -311,23 +314,45 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // todoListView
-    m_itemModel = new QStandardItemModel(this);
-    m_itemModel->setColumnCount(1);
-    m_itemSelcModel = new QItemSelectionModel(m_itemModel, this);
-    ui->todoListView->setModel(m_itemModel);
-    ui->todoListView->setSelectionModel(m_itemSelcModel);
+//    m_itemModel = new QStandardItemModel(this);
+//    m_itemModel->setColumnCount(1);
+//    m_itemSelcModel = new QItemSelectionModel(m_itemModel, this);
+//    ui->todoListView->setModel(m_itemModel);
+//    ui->todoListView->setSelectionModel(m_itemSelcModel);
 
     // listNamesView
-    m_listNamesModel = new QStandardItemModel(this);
-    m_listNamesModel->setColumnCount(1);
-    m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
-    ui->listNamesView->setModel(m_listNamesModel);
-    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
+//    m_listNamesModel = new QStandardItemModel(this);
+//    m_listNamesModel->setColumnCount(1);
+//    m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
+//    ui->listNamesView->setModel(m_listNamesModel);
+//    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
-    initConnect();
-    initLists();
-    disableTaskDetailsUi();
-    clearTaskDetailsUiContent();
+//    initConnect();
+//    initLists();
+//    disableTaskDetailsUi();
+//    clearTaskDetailsUiContent();
+
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    m_db.setDatabaseName("../Tokie/data/tasks.db"); // how to deal with the path when release?
+    if(!m_db.open())
+    {
+        qDebug() << "failed to open db";
+    }
+    else
+    {
+        QStringList tables = m_db.tables();
+        for(const auto& table: tables)
+        {
+            qDebug() << "Table name: " << table;
+        }
+        m_tableModel = new QSqlTableModel(this);
+        m_tableModel->setTable("list1");
+        m_tableModel->select();
+        ui->todoListView->setModel(m_tableModel);
+        m_itemSelcModel = new QItemSelectionModel(m_tableModel, this);
+
+    }
+
 }
 
 MainWindow::~MainWindow()
