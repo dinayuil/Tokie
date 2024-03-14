@@ -6,6 +6,7 @@
 #include <QItemSelectionModel>
 #include <QStringListModel>
 #include <QSqlTableModel>
+#include <QSqlQueryModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,7 +24,7 @@ private:
     QHash<QString, QStandardItemModel*> m_nameToListMap;
     QStandardItem* m_beingModifiedItem = nullptr;
     QSqlDatabase m_db;
-    QSqlTableModel* m_tableModel;
+    QSqlQueryModel* m_queryModel;
 
     void initConnect();
     void initLists();

@@ -345,11 +345,12 @@ MainWindow::MainWindow(QWidget *parent)
         {
             qDebug() << "Table name: " << table;
         }
-        m_tableModel = new QSqlTableModel(this);
-        m_tableModel->setTable("list1");
-        m_tableModel->select();
-        ui->todoListView->setModel(m_tableModel);
-        m_itemSelcModel = new QItemSelectionModel(m_tableModel, this);
+        m_queryModel = new QSqlQueryModel(this);
+        m_queryModel->setQuery("SELECT name from list1", m_db);
+
+
+        ui->todoListView->setModel(m_queryModel);
+        m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
 
     }
 
