@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QSqlDatabase>
+#include <QSqlRecord>
 
 #include "task.h"
 
@@ -18,6 +19,7 @@ void MainWindow::initConnect()
     // todo list item selection
     connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(onItemSelcChanged(QItemSelection)));
+//    connect(ui->todoListView->selectionModel(), SIGNAL(row))
 
     /* Task details UI */
     connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
@@ -78,28 +80,30 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     else
     {
         enableTaskDetailsUi();
-        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
-        ui->taskNameLineEdit->setText(task->name());
-        ui->taskReminderChkBox->setChecked(task->enableReminder());
-        if(task->enableReminder())
-        {
-            if(task->reminder().isValid()) ui->taskReminderDateTimeEdit->setDateTime(task->reminder());
-        }
-        ui->taskDueChkBox->setChecked(task->enableDue());
-        if(task->enableDue())
-        {
-            if(task->due().isValid()) ui->taskDueDateEdit->setDate(task->due());
-        }
-        ui->taskCommentTextEdit->setText(task->comment());
+        QSqlRecord record = m_queryModel->record(selectedIndexes[0].row());
+        ui->taskNameLineEdit->setText(record.value("name").toString());
+//        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
+//        ui->taskNameLineEdit->setText(task->name());
+//        ui->taskReminderChkBox->setChecked(task->enableReminder());
+//        if(task->enableReminder())
+//        {
+//            if(task->reminder().isValid()) ui->taskReminderDateTimeEdit->setDateTime(task->reminder());
+//        }
+//        ui->taskDueChkBox->setChecked(task->enableDue());
+//        if(task->enableDue())
+//        {
+//            if(task->due().isValid()) ui->taskDueDateEdit->setDate(task->due());
+//        }
+//        ui->taskCommentTextEdit->setText(task->comment());
 
-        qDebug() << "onItemSelcChanged: task name: " << task->name();
+//        qDebug() << "onItemSelcChanged: task name: " << task->name();
     }
 
 
-    for(int i = 0; i < selectedIndexes.size(); i++)
-    {
-        qDebug() << m_itemModel->data(selectedIndexes[i]).toString();
-    }
+//    for(int i = 0; i < selectedIndexes.size(); i++)
+//    {
+//        qDebug() << m_itemModel->data(selectedIndexes[i]).toString();
+//    }
 }
 
 void MainWindow::onActDeleteItem()
@@ -352,6 +356,9 @@ MainWindow::MainWindow(QWidget *parent)
         ui->todoListView->setModel(m_queryModel);
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
 
+        connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(onItemSelcChanged(QItemSelection)));
+        // TODO: try data mapper, text <-> date?
     }
 
 }
