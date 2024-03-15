@@ -78,9 +78,9 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>110</y>
+        <y>331</y>
         <width>221</width>
-        <height>192</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -99,6 +99,22 @@
       <property name="text">
        <string>TextLabel</string>
       </property>
+     </widget>
+     <widget class="QTableView" name="taskTableView">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>110</y>
+        <width>256</width>
+        <height>192</height>
+       </rect>
+      </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
     </widget>
     <widget class="QGroupBox" name="itemDetailsBox">

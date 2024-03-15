@@ -354,10 +354,12 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Table name: " << table;
         }
         m_queryModel = new QSqlQueryModel(this);
-        m_queryModel->setQuery("SELECT name from list1", m_db);
+        m_queryModel->setQuery("SELECT name, id from list1", m_db);
 
+        ui->taskTableView->setModel(m_queryModel);
+        ui->taskTableView->hideColumn(1);
+        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-        ui->todoListView->setModel(m_queryModel);
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
 
         connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
