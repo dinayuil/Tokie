@@ -82,6 +82,10 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         enableTaskDetailsUi();
         QSqlRecord record = m_queryModel->record(selectedIndexes[0].row());
         ui->taskNameLineEdit->setText(record.value("name").toString());
+        if(record.value("due").isNull())
+        {
+            qDebug() << "no due info";
+        }
 //        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
 //        ui->taskNameLineEdit->setText(task->name());
 //        ui->taskReminderChkBox->setChecked(task->enableReminder());
