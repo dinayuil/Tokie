@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QSqlDatabase>
 #include <QSqlRecord>
+#include <QSqlQuery>
 
 #include "task.h"
 
@@ -19,7 +20,7 @@ void MainWindow::initConnect()
     // todo list item selection
     connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(onItemSelcChanged(QItemSelection)));
-//    connect(ui->todoListView->selectionModel(), SIGNAL(row))
+
 
     /* Task details UI */
     connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
@@ -82,10 +83,29 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         enableTaskDetailsUi();
         QSqlRecord record = m_queryModel->record(selectedIndexes[0].row());
         ui->taskNameLineEdit->setText(record.value("name").toString());
-        if(record.value("due").isNull())
+        if(record.value("id").isNull())
         {
-            qDebug() << "no due info";
+            qDebug() << "no id info";
         }
+        else
+        {
+            QVariant id = record.value("id");
+            qDebug() << id;
+            QSqlQuery query;
+            query.prepare("SELECT * FROM list1 WHERE id =:id");
+            query.bindValue(":id", id);
+            query.exec();
+            query.first();
+            QSqlRecord detailedRec = query.record();
+            qDebug() << detailedRec.value("name").toString();
+//            qDebug() << detailedRec.value("enable_due");
+//            qDebug() << detailedRec.value("enable_reminder");
+            qDebug() << detailedRec.value("due").toString();
+//            qDebug() << detailedRec.value("reminder");
+//            qDebug() << detailedRec.value("completed");
+//            qDebug() << detailedRec.value("comment");
+        }
+
 //        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
 //        ui->taskNameLineEdit->setText(task->name());
 //        ui->taskReminderChkBox->setChecked(task->enableReminder());
@@ -354,15 +374,15 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Table name: " << table;
         }
         m_queryModel = new QSqlQueryModel(this);
-        m_queryModel->setQuery("SELECT name, id from list1", m_db);
+        m_queryModel->setQuery("SELECT name, id FROM list1", m_db);
 
         ui->taskTableView->setModel(m_queryModel);
         ui->taskTableView->hideColumn(1);
         ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
-
-        connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+        ui->taskTableView->setSelectionModel(m_itemSelcModel);
+        connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
                 this, SLOT(onItemSelcChanged(QItemSelection)));
         // TODO: try data mapper, text <-> date?
     }
