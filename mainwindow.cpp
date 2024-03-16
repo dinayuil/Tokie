@@ -6,12 +6,13 @@
 #include <QSqlDatabase>
 #include <QSqlRecord>
 #include <QSqlQuery>
+#include <QSqlError>
 
 #include "task.h"
 
 void MainWindow::initConnect()
 {
-    /* todo list */
+    /* task list */
 //    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
@@ -29,9 +30,9 @@ void MainWindow::initConnect()
 //    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
 //    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
-    /* lists of todo list*/
+    /* lists of task list*/
 //    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
-//    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     // lists right click menu
 //    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
 //    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
@@ -56,19 +57,29 @@ void MainWindow::onAddItemBtnClicked()
 void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 {
     QModelIndexList selectedIndexes = selected.indexes();
-    for(int i = 0; i < selectedIndexes.size(); i++)
+    if(!selected.empty())
     {
+        QString listName = m_listNamesModel->data(selectedIndexes[0]).toString();
+        qDebug() << "list name: " << listName;
 
-        qDebug() << m_listNamesModel->data(selectedIndexes[i]).toString();
+        /*
+        QSqlQuery::prepare does not support place holder like
+        "SELECT name, id FROM :list"
+        */
+        QString queryString = "SELECT name, id FROM " + listName;
 
-        m_itemModel = m_nameToListMap[m_listNamesModel->data(selectedIndexes[i]).toString()];
-        ui->todoListView->setModel(m_itemModel);
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
 
-        m_itemSelcModel->setModel(m_itemModel);
-        ui->todoListView->setSelectionModel(m_itemSelcModel);
+        m_queryModel->setQuery(std::move(query));
+//        m_listNameSelcModel->setModel(m_queryModel);
 
         disableTaskDetailsUi();
     }
+
 }
 
 void MainWindow::onItemSelcChanged(const QItemSelection &selected)
@@ -81,7 +92,7 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     else
     {
         QSqlRecord record = m_queryModel->record(selectedIndexes[0].row());
-        ui->taskNameLineEdit->setText(record.value("name").toString());
+
         if(record.value("id").isNull())
         {
             qDebug() << "no id info";
@@ -90,13 +101,22 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         {
             QVariant id = record.value("id");
             qDebug() << id;
-            QSqlQuery query;
-            query.prepare("SELECT * FROM list1 WHERE id =:id");
-            query.bindValue(":id", id);
-            query.exec();
+
+            QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+            QString queryString = QString("SELECT * FROM %1 WHERE id = %2").arg(listName, id.toString());
+            QSqlQuery query(queryString, m_db);
+            if(query.lastError().isValid())
+            {
+                qDebug() << query.lastError().text();
+            }
+//            query.prepare("SELECT * FROM list1 WHERE id =:id");
+//            query.bindValue(":id", id);
+//            query.exec();
             query.first();
 
             QSqlRecord detailedRec = query.record();
+
+            ui->taskNameLineEdit->setText(detailedRec.value("name").toString());
 
             ui->taskDueChkBox->setChecked(detailedRec.value("enable_due").toBool());
 
@@ -337,11 +357,11 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->todoListView->setSelectionModel(m_itemSelcModel);
 
     // listNamesView
-//    m_listNamesModel = new QStandardItemModel(this);
-//    m_listNamesModel->setColumnCount(1);
-//    m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
-//    ui->listNamesView->setModel(m_listNamesModel);
-//    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
+    m_listNamesModel = new QStandardItemModel(this);
+    m_listNamesModel->setColumnCount(1);
+    m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
+    ui->listNamesView->setModel(m_listNamesModel);
+    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
 //    initLists();
 //    disableTaskDetailsUi();
@@ -358,6 +378,11 @@ MainWindow::MainWindow(QWidget *parent)
         QStringList tables = m_db.tables();
         for(const auto& table: tables)
         {
+            if(table != "sqlite_sequence")
+            {
+                QStandardItem* item = new QStandardItem(table);
+                m_listNamesModel->appendRow(item);
+            }
             qDebug() << "Table name: " << table;
         }
         m_queryModel = new QSqlQueryModel(this);
