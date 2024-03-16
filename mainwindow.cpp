@@ -12,29 +12,29 @@
 void MainWindow::initConnect()
 {
     /* todo list */
-    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
+//    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
-    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTodoList(QPoint)));
-    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+//    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTodoList(QPoint)));
+//    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
     // todo list item selection
-    connect(ui->todoListView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+    connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(onItemSelcChanged(QItemSelection)));
 
 
     /* Task details UI */
-    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
+//    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
-    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
-    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
+//    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
+//    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
     /* lists of todo list*/
-    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
-    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+//    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
+//    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     // lists right click menu
-    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
-    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
+//    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
+//    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -80,7 +80,6 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     }
     else
     {
-        enableTaskDetailsUi();
         QSqlRecord record = m_queryModel->record(selectedIndexes[0].row());
         ui->taskNameLineEdit->setText(record.value("name").toString());
         if(record.value("id").isNull())
@@ -96,38 +95,27 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
             query.bindValue(":id", id);
             query.exec();
             query.first();
+
             QSqlRecord detailedRec = query.record();
-            qDebug() << detailedRec.value("name").toString();
-//            qDebug() << detailedRec.value("enable_due");
-//            qDebug() << detailedRec.value("enable_reminder");
-            qDebug() << detailedRec.value("due").toString();
-//            qDebug() << detailedRec.value("reminder");
-//            qDebug() << detailedRec.value("completed");
-//            qDebug() << detailedRec.value("comment");
+
+            ui->taskDueChkBox->setChecked(detailedRec.value("enable_due").toBool());
+
+            QDate dueDate = detailedRec.value("due").toDate();   // only accept Qt::ISODate format
+            if(dueDate.isValid()) ui->taskDueDateEdit->setDate(dueDate);
+
+            ui->taskReminderChkBox->setChecked(detailedRec.value("enable_reminder").toBool());
+
+            QDateTime reminderDateTime = detailedRec.value("reminder").toDateTime();    // only accept Qt::ISODateTime format
+            if(reminderDateTime.isValid()) ui->taskReminderDateTimeEdit->setDateTime(reminderDateTime);
+
+            ui->taskCommentTextEdit->setText(detailedRec.value("comment").toString());
+
+            qDebug() << "Completed" << detailedRec.value("completed").toBool();
+
+            enableTaskDetailsUi();
         }
-
-//        Task* task = m_itemModel->data(selectedIndexes[0], Qt::UserRole+1).value<Task *>();
-//        ui->taskNameLineEdit->setText(task->name());
-//        ui->taskReminderChkBox->setChecked(task->enableReminder());
-//        if(task->enableReminder())
-//        {
-//            if(task->reminder().isValid()) ui->taskReminderDateTimeEdit->setDateTime(task->reminder());
-//        }
-//        ui->taskDueChkBox->setChecked(task->enableDue());
-//        if(task->enableDue())
-//        {
-//            if(task->due().isValid()) ui->taskDueDateEdit->setDate(task->due());
-//        }
-//        ui->taskCommentTextEdit->setText(task->comment());
-
-//        qDebug() << "onItemSelcChanged: task name: " << task->name();
     }
 
-
-//    for(int i = 0; i < selectedIndexes.size(); i++)
-//    {
-//        qDebug() << m_itemModel->data(selectedIndexes[i]).toString();
-//    }
 }
 
 void MainWindow::onActDeleteItem()
@@ -216,8 +204,8 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
     QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
     if(!indexes.empty())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        task->setEnableReminder(checked);
+//        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+//        task->setEnableReminder(checked);
     }
 }
 
@@ -227,8 +215,8 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
     QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
     if(!indexes.empty())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        task->setEnableDue(checked);
+//        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
+//        task->setEnableDue(checked);
     }
 }
 
@@ -309,7 +297,7 @@ void MainWindow::enableTaskDetailsUi()
     ui->taskReminderChkBox->setEnabled(true);
     ui->taskReminderDateTimeEdit->setEnabled(ui->taskReminderChkBox->isChecked());
     ui->taskDueChkBox->setEnabled(true);
-    ui->taskDueDateEdit->setEnabled(ui->taskReminderChkBox->isChecked());
+    ui->taskDueDateEdit->setEnabled(ui->taskDueChkBox->isChecked());
     ui->taskCommentTextEdit->setEnabled(true);
 }
 
@@ -355,7 +343,6 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->listNamesView->setModel(m_listNamesModel);
 //    ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
-//    initConnect();
 //    initLists();
 //    disableTaskDetailsUi();
 //    clearTaskDetailsUiContent();
@@ -382,11 +369,11 @@ MainWindow::MainWindow(QWidget *parent)
 
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
         ui->taskTableView->setSelectionModel(m_itemSelcModel);
-        connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-                this, SLOT(onItemSelcChanged(QItemSelection)));
+
         // TODO: try data mapper, text <-> date?
     }
 
+    initConnect();
 }
 
 MainWindow::~MainWindow()
