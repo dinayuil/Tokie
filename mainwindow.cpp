@@ -13,7 +13,7 @@
 void MainWindow::initConnect()
 {
     /* task list */
-//    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
+    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // task list right click menu
     connect(ui->taskTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTaskList(QPoint)));
@@ -40,16 +40,21 @@ void MainWindow::initConnect()
 
 void MainWindow::onAddItemBtnClicked()
 {
-    QString newTodo = ui->newTodoEdit->text();
-    if(!newTodo.isEmpty())
+    QString newTaskName = ui->newTodoEdit->text();
+    if(!newTaskName.isEmpty())
     {
-        QStandardItem* item = new QStandardItem(newTodo);
-        Task* task = new Task(newTodo);     // TODO: how to delete, manually, smart pointer or use QObject ?
-        QVariant variant;
-        variant.setValue(task);
-        item->setData(variant);
-        item->setCheckable(true);
-        m_itemModel->appendRow(item);
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("INSERT INTO %1 (name) VALUES (\"%2\")").arg(listName, newTaskName);
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            m_queryModel->setQuery(std::move(query));
+        }
+
         ui->newTodoEdit->clear();
     }
 }
