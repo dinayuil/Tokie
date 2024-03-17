@@ -15,10 +15,10 @@ void MainWindow::initConnect()
     /* task list */
 //    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
-    // todo list right click menu
+    // task list right click menu
     connect(ui->taskTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTaskList(QPoint)));
-//    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
-    // todo list item selection
+    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+    // task list item selection
     connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(onItemSelcChanged(QItemSelection)));
 
@@ -143,8 +143,22 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onActDeleteItem()
 {
-    int currentRow = m_itemSelcModel->currentIndex().row();
-    m_itemModel->removeRow(currentRow); // this will release the memory, no need to use `delete`
+    QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+    QVariant id = record.value("id");
+    if(id.isValid())
+    {
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("DELETE FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            m_queryModel->setQuery(std::move(query));
+        }
+    }
 }
 
 void MainWindow::onRightClickInTaskList(const QPoint &pos)
