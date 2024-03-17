@@ -24,7 +24,7 @@ void MainWindow::initConnect()
 
 
     /* Task details UI */
-//    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
+    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
 //    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
@@ -267,14 +267,24 @@ void MainWindow::onTaskNameLineEditFinished()
     QModelIndexList indexes = m_itemSelcModel->selectedIndexes();   // this will still get the index for the item that is being modified, not the next selected item
     if(!indexes.empty())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        QString newName = ui->taskNameLineEdit->text();
-        if(!newName.isEmpty())
+        QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+        QVariant id = record.value("id");
+        if(id.isValid())
         {
-            task->setName(newName);
-            m_itemModel->setData(indexes[0], newName, Qt::DisplayRole);
+            QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+            QString newName = ui->taskNameLineEdit->text();
+            QString queryString = QString("UPDATE %1 SET name = \"%2\" WHERE id = %3").arg(listName, newName, id.toString());
+            QSqlQuery query(queryString, m_db);
+            if(query.lastError().isValid())
+            {
+                qDebug() << query.lastError().text();
+            }
+            else
+            {
+                m_queryModel->setQuery(std::move(query));
+                qDebug() << "onTaskNameLineEditFinished: " << newName;
+            }
         }
-        qDebug() << "onTaskNameLineEditFinished: " << newName;
     }
 }
 
@@ -418,7 +428,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
         ui->taskTableView->setSelectionModel(m_itemSelcModel);
 
-        // TODO: try data mapper, text <-> date?
+        // TODO: after set new query for queryModel, the view is empty, how to solve?
     }
 
     initConnect();

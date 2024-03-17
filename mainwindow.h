@@ -38,7 +38,7 @@ private slots:
     void onListNameSelcChanged(const QItemSelection &selected);
     void onItemSelcChanged(const QItemSelection &selected);
     void onActDeleteItem();
-    void onRightClickInTodoList(const QPoint &pos);
+    void onRightClickInTaskList(const QPoint &pos);
     void onAddListBtnClicked();
     void onRightClickListName();
     void onActDeleteList();
