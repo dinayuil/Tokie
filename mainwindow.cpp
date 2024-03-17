@@ -16,7 +16,7 @@ void MainWindow::initConnect()
 //    connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
-//    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTodoList(QPoint)));
+    connect(ui->taskTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTaskList(QPoint)));
 //    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
     // todo list item selection
     connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
@@ -75,7 +75,10 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
         }
 
         m_queryModel->setQuery(std::move(query));
-//        m_listNameSelcModel->setModel(m_queryModel);
+
+        // when there is data in the view then the following settings can work; not work when initialized with empty data
+        ui->taskTableView->hideColumn(1);
+        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);   // one culumn use entire width
 
         disableTaskDetailsUi();
     }
@@ -144,9 +147,9 @@ void MainWindow::onActDeleteItem()
     m_itemModel->removeRow(currentRow); // this will release the memory, no need to use `delete`
 }
 
-void MainWindow::onRightClickInTodoList(const QPoint &pos)
+void MainWindow::onRightClickInTaskList(const QPoint &pos)
 {
-    if(ui->todoListView->indexAt(pos).isValid())
+    if(ui->taskTableView->indexAt(pos).isValid())
     {
         QMenu* menuList= new QMenu(this);
         menuList->addAction(ui->actionDeleteItem);
@@ -346,7 +349,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
+//    ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->taskTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // todoListView
@@ -386,11 +390,11 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Table name: " << table;
         }
         m_queryModel = new QSqlQueryModel(this);
-        m_queryModel->setQuery("SELECT name, id FROM list1", m_db);
+//        m_queryModel->setQuery("SELECT name, id FROM list1", m_db);
 
         ui->taskTableView->setModel(m_queryModel);
-        ui->taskTableView->hideColumn(1);
-        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+//        ui->taskTableView->hideColumn(1);
+//        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
         ui->taskTableView->setSelectionModel(m_itemSelcModel);
