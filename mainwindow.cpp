@@ -14,12 +14,11 @@ void MainWindow::initConnect()
 {
     /* task list */
     connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
-//    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // task list right click menu
     connect(ui->taskTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTaskList(QPoint)));
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
     // task list item selection
-    connect(ui->taskTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(onItemSelcChanged(QItemSelection)));
 
 
@@ -31,7 +30,7 @@ void MainWindow::initConnect()
 //    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
     /* lists of task list*/
-//    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
+    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     // lists right click menu
 //    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
@@ -44,7 +43,7 @@ void MainWindow::onAddItemBtnClicked()
     if(!newTaskName.isEmpty())
     {
         QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-        QString queryString = QString("INSERT INTO %1 (name) VALUES (\"%2\")").arg(listName, newTaskName);
+        QString queryString = QString("INSERT INTO \"%1\" (name) VALUES ('%2')").arg(listName, newTaskName);
         QSqlQuery query(queryString, m_db);
         if(query.lastError().isValid())
         {
@@ -71,7 +70,7 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
         QSqlQuery::prepare does not support place holder like
         "SELECT name, id FROM :list"
         */
-        QString queryString = "SELECT name, id FROM " + listName;
+        QString queryString = QString("SELECT name, id FROM \"%1\"").arg(listName);
 
         QSqlQuery query(queryString, m_db);
         if(query.lastError().isValid())
@@ -111,7 +110,7 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
             qDebug() << id;
 
             QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-            QString queryString = QString("SELECT * FROM %1 WHERE id = %2").arg(listName, id.toString());
+            QString queryString = QString("SELECT * FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
             QSqlQuery query(queryString, m_db);
             if(query.lastError().isValid())
             {
@@ -154,7 +153,7 @@ void MainWindow::onActDeleteItem()
     if(id.isValid())
     {
         QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-        QString queryString = QString("DELETE FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QString queryString = QString("DELETE FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
         QSqlQuery query(queryString, m_db);
         if(query.lastError().isValid())
         {
@@ -186,7 +185,7 @@ void MainWindow::onAddListBtnClicked()
     QString listName = "Unnamed list";
     while(!validName)
     {
-        bool ok= false;
+        bool ok = false;
         listName = QInputDialog::getText(this, dlgTitle, txtLabel, QLineEdit::Normal, listName, &ok);
         if(!ok)
         {
@@ -194,7 +193,8 @@ void MainWindow::onAddListBtnClicked()
         }
         if (ok && !listName.isEmpty())
         {
-            if(!m_nameToListMap.contains(listName))
+            QStringList tables = m_db.tables();
+            if(!tables.contains(listName))
             {
                 validName = true;
             }
@@ -207,8 +207,28 @@ void MainWindow::onAddListBtnClicked()
 
     if(validName)
     {
-        QStandardItem* item = new QStandardItem(listName);
-        m_listNamesModel->appendRow(item);
+        QString queryString = QString("CREATE TABLE \"%1\" ("
+                              "name TEXT NOT NULL,"
+                              "id INTEGER,"
+                              "enable_due INTEGER NOT NULL DEFAULT 0,"
+                              "enable_reminder INTEGER NOT NULL DEFAULT 0,"
+                              "due TEXT,"
+                              "reminder TEXT,"
+                              "completed INTEGER DEFAULT 0,"
+                              "comment TEXT,"
+                              "PRIMARY KEY(id AUTOINCREMENT)"
+                                      ");").arg(listName);
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            QStandardItem* item = new QStandardItem(listName);
+            m_listNamesModel->appendRow(item);
+        }
+
         m_nameToListMap[listName] = new QStandardItemModel(this);
         m_nameToListMap[listName]->setColumnCount(1);
     }
@@ -248,7 +268,7 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
     if(id.isValid())
     {
         QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-        QString queryString = QString("SELECT enable_reminder FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QString queryString = QString("SELECT enable_reminder FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
         QSqlQuery query(queryString, m_db);
         if(query.lastError().isValid())
         {
@@ -261,7 +281,7 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
             bool originalEnableDue = record.value("enable_reminder").toBool();
             if(originalEnableDue != checked)
             {
-                queryString = QString("UPDATE %1 SET enable_reminder = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
+                queryString = QString("UPDATE \"%1\" SET enable_reminder = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
                 QSqlQuery updateQuery(queryString, m_db);
                 if(updateQuery.lastError().isValid())
                 {
@@ -285,7 +305,7 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
     if(id.isValid())
     {
         QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-        QString queryString = QString("SELECT enable_due FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QString queryString = QString("SELECT enable_due FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
         QSqlQuery query(queryString, m_db);
         if(query.lastError().isValid())
         {
@@ -298,7 +318,7 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
             bool originalEnableDue = record.value("enable_due").toBool();
             if(originalEnableDue != checked)
             {
-                queryString = QString("UPDATE %1 SET enable_due = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
+                queryString = QString("UPDATE \"%1\" SET enable_due = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
                 QSqlQuery updateQuery(queryString, m_db);
                 if(updateQuery.lastError().isValid())
                 {
@@ -325,8 +345,8 @@ void MainWindow::onTaskNameLineEditFinished()
         if(id.isValid())
         {
             QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
-            QString newName = ui->taskNameLineEdit->text();
-            QString queryString = QString("UPDATE %1 SET name = \"%2\" WHERE id = %3").arg(listName, newName, id.toString());
+            QString newTaskName = ui->taskNameLineEdit->text();
+            QString queryString = QString("UPDATE \"%1\" SET name = '%2' WHERE id = %3").arg(listName, newTaskName, id.toString());
             QSqlQuery query(queryString, m_db);
             if(query.lastError().isValid())
             {
@@ -335,7 +355,7 @@ void MainWindow::onTaskNameLineEditFinished()
             else
             {
                 m_queryModel->setQuery(std::move(query));
-                qDebug() << "onTaskNameLineEditFinished: " << newName;
+                qDebug() << "onTaskNameLineEditFinished: " << newTaskName;
             }
         }
     }
@@ -472,11 +492,8 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Table name: " << table;
         }
         m_queryModel = new QSqlQueryModel(this);
-//        m_queryModel->setQuery("SELECT name, id FROM list1", m_db);
 
         ui->taskTableView->setModel(m_queryModel);
-//        ui->taskTableView->hideColumn(1);
-//        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
         ui->taskTableView->setSelectionModel(m_itemSelcModel);
