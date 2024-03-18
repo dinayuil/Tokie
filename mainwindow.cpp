@@ -131,7 +131,8 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
             QDate dueDate = detailedRec.value("due").toDate();   // only accept Qt::ISODate format
             if(dueDate.isValid()) ui->taskDueDateEdit->setDate(dueDate);
 
-            ui->taskReminderChkBox->setChecked(detailedRec.value("enable_reminder").toBool());
+//            ui->taskReminderChkBox->setChecked(detailedRec.value("enable_reminder").toBool());  // this seems trigger the triggered
+            ui->taskReminderChkBox->setCheckState(detailedRec.value("enable_reminder").toBool() ? Qt::Checked : Qt::Unchecked);
 
             QDateTime reminderDateTime = detailedRec.value("reminder").toDateTime();    // only accept Qt::ISODateTime format
             if(reminderDateTime.isValid()) ui->taskReminderDateTimeEdit->setDateTime(reminderDateTime);
@@ -242,23 +243,75 @@ void MainWindow::onActDeleteList()
 
 void MainWindow::onTaskReminderChkBoxToggled(bool checked)
 {
-    ui->taskReminderDateTimeEdit->setEnabled(checked);
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+    QVariant id = record.value("id");
+    if(id.isValid())
     {
-//        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-//        task->setEnableReminder(checked);
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("SELECT enable_reminder FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            query.first();
+            record = query.record();
+            bool originalEnableDue = record.value("enable_reminder").toBool();
+            if(originalEnableDue != checked)
+            {
+                queryString = QString("UPDATE %1 SET enable_reminder = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
+                QSqlQuery updateQuery(queryString, m_db);
+                if(updateQuery.lastError().isValid())
+                {
+                    qDebug() << query.lastError().text();
+                }
+                else
+                {
+                    m_queryModel->setQuery(std::move(updateQuery));
+                    ui->taskReminderDateTimeEdit->setEnabled(checked);
+                    qDebug() << "updated enable_reminder";
+                }
+            }
+        }
     }
 }
 
 void MainWindow::onTaskDueChkBoxToggled(bool checked)
 {
-    ui->taskDueDateEdit->setEnabled(checked);
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+    QVariant id = record.value("id");
+    if(id.isValid())
     {
-//        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-//        task->setEnableDue(checked);
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("SELECT enable_due FROM %1 WHERE id = %2").arg(listName, id.toString());
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
+        {
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            query.first();
+            record = query.record();
+            bool originalEnableDue = record.value("enable_due").toBool();
+            if(originalEnableDue != checked)
+            {
+                queryString = QString("UPDATE %1 SET enable_due = %2 WHERE id = %3").arg(listName, QString::number(checked), id.toString());
+                QSqlQuery updateQuery(queryString, m_db);
+                if(updateQuery.lastError().isValid())
+                {
+                    qDebug() << query.lastError().text();
+                }
+                else
+                {
+                    m_queryModel->setQuery(std::move(updateQuery));
+                    ui->taskReminderDateTimeEdit->setEnabled(checked);
+                    qDebug() << "updated enable_due";
+                }
+            }
+        }
     }
 }
 
