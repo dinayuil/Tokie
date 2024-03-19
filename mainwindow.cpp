@@ -228,8 +228,6 @@ void MainWindow::onAddListBtnClicked()
             m_listNamesModel->appendRow(item);
         }
 
-        m_nameToListMap[listName] = new QStandardItemModel(this);
-        m_nameToListMap[listName]->setColumnCount(1);
     }
 
 }
@@ -429,33 +427,6 @@ void MainWindow::onTaskDueDateEditFinished()
     }
 }
 
-void MainWindow::initLists()
-{
-    // in the future they should be loaded from disk
-    QList<QString> allListNames;
-    allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
-    for(const auto& name: allListNames)
-    {
-        m_nameToListMap[name] = new QStandardItemModel(this);
-        m_nameToListMap[name]->setColumnCount(1);
-    }
-
-    for(const auto& name: allListNames)
-    {
-        QStandardItem* item = new QStandardItem(name);
-        m_listNamesModel->appendRow(item);
-    }
-
-
-    for(long i = 0; i < 15; i++)
-    {
-        QStandardItem* item = new QStandardItem(QString::number(i));
-        item->setCheckable(true);
-        m_itemModel->appendRow(item);
-    }
-
-}
-
 void MainWindow::enableTaskDetailsUi()
 {
     ui->taskNameLineEdit->setEnabled(true);
@@ -491,16 +462,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
+
     ui->taskTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    // todoListView
-//    m_itemModel = new QStandardItemModel(this);
-//    m_itemModel->setColumnCount(1);
-//    m_itemSelcModel = new QItemSelectionModel(m_itemModel, this);
-//    ui->todoListView->setModel(m_itemModel);
-//    ui->todoListView->setSelectionModel(m_itemSelcModel);
 
     // listNamesView
     m_listNamesModel = new QStandardItemModel(this);
@@ -509,9 +473,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listNamesView->setModel(m_listNamesModel);
     ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
-//    initLists();
-//    disableTaskDetailsUi();
-//    clearTaskDetailsUiContent();
+    disableTaskDetailsUi();
+    clearTaskDetailsUiContent();
 
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName("../Tokie/data/tasks.db"); // how to deal with the path when release?

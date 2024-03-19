@@ -21,17 +21,12 @@ private:
     QItemSelectionModel* m_itemSelcModel;
     QStandardItemModel* m_listNamesModel;
     QItemSelectionModel* m_listNameSelcModel;
-    QHash<QString, QStandardItemModel*> m_nameToListMap;
-    QStandardItem* m_beingModifiedItem = nullptr;
     QSqlDatabase m_db;
     QSqlQueryModel* m_queryModel;
 
     void initConnect();
-    void initLists();
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
-    void clearTaskDetailsUiContent();
-    QStandardItem* beingModifiedItem();
 
 private slots:
     void onAddItemBtnClicked();
@@ -55,5 +50,6 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    void clearTaskDetailsUiContent();
 };
 #endif // MAINWINDOW_H
