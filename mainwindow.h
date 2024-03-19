@@ -40,7 +40,7 @@ private slots:
     void onActDeleteItem();
     void onRightClickInTaskList(const QPoint &pos);
     void onAddListBtnClicked();
-    void onRightClickListName();
+    void onRightClickInListNameList(const QPoint &pos);
     void onActDeleteList();
     void onTaskReminderChkBoxToggled(bool checked);
     void onTaskDueChkBoxToggled(bool checked);

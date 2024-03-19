@@ -33,8 +33,8 @@ void MainWindow::initConnect()
     connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
     connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
     // lists right click menu
-//    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
-//    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
+    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInListNameList(QPoint)));
+    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -235,30 +235,31 @@ void MainWindow::onAddListBtnClicked()
 
 }
 
-void MainWindow::onRightClickListName()
+void MainWindow::onRightClickInListNameList(const QPoint &pos)
 {
-    QMenu* menuList= new QMenu(this);
-    menuList->addAction(ui->actionDeleteList);
-    if(!m_listNameSelcModel->currentIndex().isValid())
+    if(ui->listNamesView->indexAt(pos).isValid())
     {
-        ui->actionDeleteList->setEnabled(false);
+        QMenu* menuList= new QMenu(this);
+        menuList->addAction(ui->actionDeleteList);
+        menuList->exec(QCursor::pos());
+        delete menuList;
     }
-    else
-    {
-        ui->actionDeleteList->setEnabled(true);
-    }
-    menuList->exec(QCursor::pos());
-    delete menuList;
 }
 
 void MainWindow::onActDeleteList()
 {
-    int currentRow = m_listNameSelcModel->currentIndex().row();
-    QStandardItem* listNameItem = m_listNamesModel->item(currentRow);
-    QStandardItemModel* todoItemModel = m_nameToListMap[listNameItem->text()];
-    delete todoItemModel;   // call the model's destructor, and also destroys all its items
-    m_nameToListMap.remove(listNameItem->text());
-    m_listNamesModel->removeRow(currentRow);
+    QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+    QString queryString = QString("DROP TABLE \"%1\"").arg(listName);
+    QSqlQuery query(queryString, m_db);
+    if(query.lastError().isValid())
+    {
+        qDebug() << query.lastError().text();
+    }
+    else
+    {
+        int currentRow = m_listNameSelcModel->currentIndex().row();
+        m_listNamesModel->removeRow(currentRow);
+    }
 }
 
 void MainWindow::onTaskReminderChkBoxToggled(bool checked)
