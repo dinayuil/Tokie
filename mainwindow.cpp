@@ -287,7 +287,6 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
                 }
                 else
                 {
-                    m_queryModel->setQuery(std::move(updateQuery));
                     ui->taskReminderDateTimeEdit->setEnabled(checked);
                     qDebug() << "updated enable_reminder";
                 }
@@ -324,7 +323,6 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
                 }
                 else
                 {
-                    m_queryModel->setQuery(std::move(updateQuery));
                     ui->taskDueDateEdit->setEnabled(checked);
                     qDebug() << "updated enable_due";
                 }
@@ -343,17 +341,21 @@ void MainWindow::onTaskNameLineEditFinished()
         if(id.isValid())
         {
             QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+            QString previousName = record.value("name").toString();
             QString newTaskName = ui->taskNameLineEdit->text();
-            QString queryString = QString("UPDATE \"%1\" SET name = '%2' WHERE id = %3").arg(listName, newTaskName, id.toString());
-            QSqlQuery query(queryString, m_db);
-            if(query.lastError().isValid())
+            if(previousName != newTaskName)
             {
-                qDebug() << query.lastError().text();
-            }
-            else
-            {
-                m_queryModel->setQuery(std::move(query));
-                qDebug() << "onTaskNameLineEditFinished: " << newTaskName;
+                QString queryString = QString("UPDATE \"%1\" SET name = '%2' WHERE id = %3").arg(listName, newTaskName, id.toString());
+                QSqlQuery query(queryString, m_db);
+                if(query.lastError().isValid())
+                {
+                    qDebug() << query.lastError().text();
+                }
+                else
+                {
+                    m_queryModel->setQuery(std::move(query));
+                    qDebug() << "onTaskNameLineEditFinished: " << newTaskName;
+                }
             }
         }
     }
