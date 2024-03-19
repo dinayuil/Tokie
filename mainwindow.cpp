@@ -52,7 +52,7 @@ void MainWindow::onAddItemBtnClicked()
         }
         else
         {
-            m_queryModel->setQuery(std::move(query));
+            queryModelRefresh(listName);
         }
 
         ui->newTodoEdit->clear();
@@ -65,29 +65,9 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
     if(!selected.empty())
     {
         QString listName = m_listNamesModel->data(selectedIndexes[0]).toString();
-        qDebug() << "list name: " << listName;
-
-        /*
-        QSqlQuery::prepare does not support place holder like
-        "SELECT name, id FROM :list"
-        */
-        QString queryString = QString("SELECT name, id FROM \"%1\"").arg(listName);
-
-        QSqlQuery query(queryString, m_db);
-        if(query.lastError().isValid())
-        {
-            qDebug() << query.lastError().text();
-        }
-
-        m_queryModel->setQuery(std::move(query));
-
-        // when there is data in the view then the following settings can work; not work when initialized with empty data
-        ui->taskTableView->hideColumn(1);
-        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);   // one culumn use entire width
-
+        queryModelRefresh(listName);
         disableTaskDetailsUi();
     }
-
 }
 
 void MainWindow::onItemSelcChanged(const QItemSelection &selected)
@@ -160,7 +140,7 @@ void MainWindow::onActDeleteItem()
         }
         else
         {
-            m_queryModel->setQuery(std::move(query));
+            queryModelRefresh(listName);
         }
     }
 }
@@ -353,8 +333,8 @@ void MainWindow::onTaskNameLineEditFinished()
                 }
                 else
                 {
-                    m_queryModel->setQuery(std::move(query));
                     qDebug() << "onTaskNameLineEditFinished: " << newTaskName;
+                    queryModelRefresh(listName);
                 }
             }
         }
@@ -459,6 +439,30 @@ void MainWindow::clearTaskDetailsUiContent()
     ui->taskCommentTextEdit->clear();
 }
 
+void MainWindow::queryModelRefresh(QString listName)
+{
+    qDebug() << "list name: " << listName;
+    /*
+        QSqlQuery::prepare does not support place holder like
+        "SELECT name, id FROM :list"
+        */
+    QString queryString = QString("SELECT name, id FROM \"%1\"").arg(listName);
+
+    QSqlQuery query(queryString, m_db);
+    if(query.lastError().isValid())
+    {
+        qDebug() << query.lastError().text();
+    }
+    else
+    {
+        m_queryModel->setQuery(std::move(query));
+
+        // when there is data in the view then the following settings can work; not work when initialized with empty data
+        ui->taskTableView->hideColumn(1);
+        ui->taskTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);   // one culumn use entire width
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -503,7 +507,6 @@ MainWindow::MainWindow(QWidget *parent)
         m_itemSelcModel = new QItemSelectionModel(m_queryModel, this);
         ui->taskTableView->setSelectionModel(m_itemSelcModel);
 
-        // TODO: after set new query for queryModel, the view is empty, how to solve?
     }
 
     initConnect();

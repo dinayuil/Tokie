@@ -51,5 +51,6 @@ private:
     Ui::MainWindow *ui;
 
     void clearTaskDetailsUiContent();
+    void queryModelRefresh(QString listName);
 };
 #endif // MAINWINDOW_H
