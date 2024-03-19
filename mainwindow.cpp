@@ -7,6 +7,7 @@
 #include <QSqlRecord>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QTimeZone>
 
 #include "task.h"
 
@@ -26,7 +27,7 @@ void MainWindow::initConnect()
     connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
-//    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
+    connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
 //    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
     /* lists of task list*/
@@ -116,34 +117,32 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
             {
                 qDebug() << query.lastError().text();
             }
-//            query.prepare("SELECT * FROM list1 WHERE id =:id");
-//            query.bindValue(":id", id);
-//            query.exec();
-            query.first();
+            else
+            {
+                query.first();
 
-            QSqlRecord detailedRec = query.record();
+                QSqlRecord detailedRec = query.record();
 
-            ui->taskNameLineEdit->setText(detailedRec.value("name").toString());
+                ui->taskNameLineEdit->setText(detailedRec.value("name").toString());
 
-            ui->taskDueChkBox->setChecked(detailedRec.value("enable_due").toBool());
+                ui->taskDueChkBox->setChecked(detailedRec.value("enable_due").toBool());
 
-            QDate dueDate = detailedRec.value("due").toDate();   // only accept Qt::ISODate format
-            if(dueDate.isValid()) ui->taskDueDateEdit->setDate(dueDate);
+                QDate dueDate = detailedRec.value("due").toDate();   // only accept Qt::ISODate format
+                if(dueDate.isValid()) ui->taskDueDateEdit->setDate(dueDate);
 
-//            ui->taskReminderChkBox->setChecked(detailedRec.value("enable_reminder").toBool());  // this seems trigger the triggered
-            ui->taskReminderChkBox->setCheckState(detailedRec.value("enable_reminder").toBool() ? Qt::Checked : Qt::Unchecked);
+                ui->taskReminderChkBox->setChecked(detailedRec.value("enable_reminder").toBool());
 
-            QDateTime reminderDateTime = detailedRec.value("reminder").toDateTime();    // only accept Qt::ISODateTime format
-            if(reminderDateTime.isValid()) ui->taskReminderDateTimeEdit->setDateTime(reminderDateTime);
+                QDateTime reminderDateTime = detailedRec.value("reminder").toDateTime();    // only accept Qt::ISODateTime format
+                if(reminderDateTime.isValid()) ui->taskReminderDateTimeEdit->setDateTime(reminderDateTime);
 
-            ui->taskCommentTextEdit->setText(detailedRec.value("comment").toString());
+                ui->taskCommentTextEdit->setText(detailedRec.value("comment").toString());
 
-            qDebug() << "Completed" << detailedRec.value("completed").toBool();
+                qDebug() << "Completed" << detailedRec.value("completed").toBool();
 
-            enableTaskDetailsUi();
+                enableTaskDetailsUi();
+            }
         }
     }
-
 }
 
 void MainWindow::onActDeleteItem()
@@ -328,7 +327,7 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
                 else
                 {
                     m_queryModel->setQuery(std::move(updateQuery));
-                    ui->taskReminderDateTimeEdit->setEnabled(checked);
+                    ui->taskDueDateEdit->setEnabled(checked);
                     qDebug() << "updated enable_due";
                 }
             }
@@ -364,16 +363,38 @@ void MainWindow::onTaskNameLineEditFinished()
 
 void MainWindow::onTaskReminderDateTimeEditFinished()
 {
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+    QVariant id = record.value("id");
+    if(id.isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        QDateTime dateTime = ui->taskReminderDateTimeEdit->dateTime();
-        if(dateTime.isValid())
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("SELECT reminder FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
         {
-            task->setReminder(dateTime);
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            query.first();
+            record = query.record();
+            QDateTime currentReminder = ui->taskReminderDateTimeEdit->dateTime();
+            currentReminder.setTimeZone(QTimeZone::systemTimeZone());
+            qDebug() << currentReminder.toString(Qt::ISODate);
+            QDateTime previousReminder = record.value("reminder").toDateTime();
+            if(!previousReminder.isValid() || previousReminder != currentReminder)
+            {
+                queryString = QString("UPDATE \"%1\" SET reminder = '%2' WHERE id = %3").arg(listName, currentReminder.toString(Qt::ISODate), id.toString());
+                if(!query.exec(queryString))
+                {
+                    qDebug() << query.lastError().text();
+                }
+
+            }
         }
     }
+
+
 }
 
 void MainWindow::onTaskDueDateEditFinished()
