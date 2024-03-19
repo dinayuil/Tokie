@@ -28,7 +28,7 @@ void MainWindow::initConnect()
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
     connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
-//    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
+    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
     /* lists of task list*/
     connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
@@ -399,14 +399,32 @@ void MainWindow::onTaskReminderDateTimeEditFinished()
 
 void MainWindow::onTaskDueDateEditFinished()
 {
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QSqlRecord record = m_queryModel->record(m_itemSelcModel->currentIndex().row());
+    QVariant id = record.value("id");
+    if(id.isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        QDate date = ui->taskDueDateEdit->date();
-        if(date.isValid())
+        QString listName = m_listNamesModel->data(m_listNameSelcModel->currentIndex()).toString();
+        QString queryString = QString("SELECT due FROM \"%1\" WHERE id = %2").arg(listName, id.toString());
+        QSqlQuery query(queryString, m_db);
+        if(query.lastError().isValid())
         {
-            task->setDue(date);
+            qDebug() << query.lastError().text();
+        }
+        else
+        {
+            query.first();
+            record = query.record();
+            QDate currentDue = ui->taskDueDateEdit->date();
+            qDebug() << currentDue.toString(Qt::ISODate);
+            QDate previousDue = record.value("due").toDate();
+            if(!previousDue.isValid() || previousDue != currentDue)
+            {
+                queryString = QString("UPDATE \"%1\" SET due = '%2' WHERE id = %3").arg(listName, currentDue.toString(Qt::ISODate), id.toString());
+                if(!query.exec(queryString))
+                {
+                    qDebug() << query.lastError().text();
+                }
+            }
         }
     }
 }
