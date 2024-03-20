@@ -1,6 +1,9 @@
 # Doing
 持久化数据、数据库存储
 
+# Thinking
+- subclass QAbstractListModel 
+
 # functional requirements
 [x] 向添加item
 [x] 删除item
