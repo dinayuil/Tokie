@@ -3,7 +3,8 @@
 Task::Task(QString name):
     m_name(name)
 {
-
+    m_id = s_startId;
+    s_startId++;
 }
 
 QString Task::name() const

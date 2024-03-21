@@ -28,6 +28,8 @@ public:
     void setComment(const QString &newComment);
 
 private:
+    static long s_startId;
+    long m_id;
     bool m_enableReminder = false;
     QDateTime m_reminder;
     bool m_enableDue = false;
