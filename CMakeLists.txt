@@ -19,6 +19,8 @@ set(PROJECT_SOURCES
         mainwindow.ui
         task.h
         task.cpp
+        tasklistmodel.h
+        tasklistmodel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

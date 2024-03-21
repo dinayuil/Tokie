@@ -1,8 +1,14 @@
 #include "task.h"
 
+long Task::s_startId=-1;
+
 Task::Task(QString name):
     m_name(name)
 {
+    if(s_startId == -1)
+    {
+        s_startId = 1;
+    }
     m_id = s_startId;
     s_startId++;
 }
