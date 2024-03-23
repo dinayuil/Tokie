@@ -27,6 +27,9 @@ public:
     QString comment() const;
     void setComment(const QString &newComment);
 
+    bool complete() const;
+    void setComplete(bool newComplete);
+
 private:
     static long s_startId;
     long m_id;
@@ -36,6 +39,7 @@ private:
     QDate m_due;
     QString m_comment = "";
     QString m_name;
+    bool m_complete = false;
 };
 
 Q_DECLARE_METATYPE(Task *);

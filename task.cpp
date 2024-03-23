@@ -72,3 +72,13 @@ void Task::setComment(const QString &newComment)
 {
     m_comment = newComment;
 }
+
+bool Task::complete() const
+{
+    return m_complete;
+}
+
+void Task::setComplete(bool newComplete)
+{
+    m_complete = newComplete;
+}
