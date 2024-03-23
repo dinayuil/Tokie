@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "task.h"
+#include "tasklistmodel.h"
 
 void MainWindow::initConnect()
 {
@@ -323,6 +324,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_listNameSelcModel = new QItemSelectionModel(m_listNamesModel, this);
     ui->listNamesView->setModel(m_listNamesModel);
     ui->listNamesView->setSelectionModel(m_listNameSelcModel);
+
+    // taskListView
+    m_taskListModel = new TaskListModel(this);
+    m_taskListModel->addTask("aa");
+    m_taskListModel->addTask("bb");
+    ui->taskListView->setModel(m_taskListModel);
+//    m_taskListModel->populate();
 
     initConnect();
     initLists();

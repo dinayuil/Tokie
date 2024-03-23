@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
 #include <QStringListModel>
+#include "tasklistmodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +22,7 @@ private:
     QItemSelectionModel* m_listNameSelcModel;
     QHash<QString, QStandardItemModel*> m_nameToListMap;
     QStandardItem* m_beingModifiedItem = nullptr;
+    TaskListModel* m_taskListModel;
 
     void initConnect();
     void initLists();
