@@ -21,12 +21,36 @@ QVariant TaskListModel::data(const QModelIndex &index, int role) const
     {
         qDebug() << index.row();
         int row = index.row();
-        if(row < m_taskList.count())
-        {
-            return QVariant(m_taskList[row].name());
-        }
+        assert(row < m_taskList.count());
+        return QVariant(m_taskList[row].name());
+
     }
     return QVariant();
+}
+
+bool TaskListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if(!index.isValid())
+    {
+        return false;
+    }
+    if ( role == Qt::DisplayRole)
+    {
+        int row = index.row();
+        assert(row < m_taskList.count());
+        m_taskList[row].setName(value.toString());
+        return true;
+    }
+    return false;
+}
+
+Qt::ItemFlags TaskListModel::flags(const QModelIndex &index) const
+{
+    if(!index.isValid())
+    {
+        return Qt::NoItemFlags;
+    }
+    return Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren;
 }
 
 void TaskListModel::addTask(QString taskName)

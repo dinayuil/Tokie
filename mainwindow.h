@@ -23,6 +23,7 @@ private:
     QHash<QString, QStandardItemModel*> m_nameToListMap;
     QStandardItem* m_beingModifiedItem = nullptr;
     TaskListModel* m_taskListModel;
+    QItemSelectionModel* m_taskListSelcModel;
 
     void initConnect();
     void initLists();

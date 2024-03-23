@@ -327,10 +327,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     // taskListView
     m_taskListModel = new TaskListModel(this);
-    m_taskListModel->addTask("aa");
-    m_taskListModel->addTask("bb");
+    m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
     ui->taskListView->setModel(m_taskListModel);
-//    m_taskListModel->populate();
+    ui->taskListView->setSelectionModel(m_taskListSelcModel);
+    m_taskListModel->addTask("aa");
+
 
     initConnect();
     initLists();
