@@ -22,7 +22,7 @@ void MainWindow::initConnect()
     /* Task details UI */
     connect(ui->taskNameLineEdit, &QLineEdit::editingFinished, this, &MainWindow::onTaskNameLineEditFinished);
     connect(ui->taskReminderChkBox, &QCheckBox::toggled, this, &MainWindow::onTaskReminderChkBoxToggled);
-    connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
+    connect(ui->taskDueChkBox, &QCheckBox::toggled, this, &MainWindow::onTaskDueChkBoxToggled);
     connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
     connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
 
@@ -71,7 +71,6 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     }
     else
     {
-        enableTaskDetailsUi();
         QModelIndex index = selectedIndexes[0];
 
         ui->taskNameLineEdit->setText(m_taskListModel->data(index, Qt::DisplayRole).toString());
@@ -95,6 +94,8 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         }
 
         ui->taskCommentTextEdit->setText(m_taskListModel->data(index, TaskCommentRole).toString());
+
+        enableTaskDetailsUi();
 
         qDebug() << "onItemSelcChanged: task name: " << m_taskListModel->data(index, Qt::DisplayRole).toString();
     }
@@ -196,12 +197,12 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
 
 void MainWindow::onTaskDueChkBoxToggled(bool checked)
 {
-    ui->taskDueDateEdit->setEnabled(checked);
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+
+    QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
+    if(!indexes.empty() && indexes[0].isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        task->setEnableDue(checked);
+        m_taskListModel->setData(indexes[0], QVariant(checked), TaskEnableDueRole);
+        ui->taskDueDateEdit->setEnabled(checked);
     }
 }
 
@@ -280,7 +281,7 @@ void MainWindow::enableTaskDetailsUi()
     ui->taskReminderChkBox->setEnabled(true);
     ui->taskReminderDateTimeEdit->setEnabled(ui->taskReminderChkBox->isChecked());
     ui->taskDueChkBox->setEnabled(true);
-    ui->taskDueDateEdit->setEnabled(ui->taskReminderChkBox->isChecked());
+    ui->taskDueDateEdit->setEnabled(ui->taskDueChkBox->isChecked());
     ui->taskCommentTextEdit->setEnabled(true);
 }
 
