@@ -13,9 +13,10 @@ void MainWindow::initConnect()
     connect(ui->addItemBtn, &QPushButton::clicked, this, &MainWindow::onAddItemBtnClicked);
     // selection change
     connect(m_taskListSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onItemSelcChanged);
-    // todo list right click menu
+    // task list right click menu
     connect(ui->taskListView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInTodoList);
-    connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
+    // context menu: delete
+    connect(ui->actionDeleteItem, &QAction::triggered, this, &MainWindow::onActDeleteItem);
 
 
     /* Task details UI */
@@ -102,8 +103,11 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 
 void MainWindow::onActDeleteItem()
 {
-    int currentRow = m_itemSelcModel->currentIndex().row();
-    m_itemModel->removeRow(currentRow); // this will release the memory, no need to use `delete`
+    QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
+    if(!indexes.empty() && indexes[0].isValid())
+    {
+        m_taskListModel->removeTask(indexes[0]);
+    }
 }
 
 void MainWindow::onRightClickInTodoList(const QPoint &pos)
