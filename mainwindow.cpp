@@ -290,16 +290,6 @@ void MainWindow::disableTaskDetailsUi()
     ui->taskCommentTextEdit->setEnabled(false);
 }
 
-void MainWindow::clearTaskDetailsUiContent()
-{
-    ui->taskNameLineEdit->clear();
-    ui->taskReminderChkBox->setCheckState(Qt::Unchecked);
-    ui->taskReminderDateTimeEdit->clear();
-    ui->taskDueChkBox->setCheckState(Qt::Unchecked);
-    ui->taskDueDateEdit->clear();
-    ui->taskCommentTextEdit->clear();
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -307,13 +297,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->taskListView->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    // todoListView
-    m_itemModel = new QStandardItemModel(this);
-    m_itemModel->setColumnCount(1);
-    m_itemSelcModel = new QItemSelectionModel(m_itemModel, this);
-    ui->todoListView->setModel(m_itemModel);
-    ui->todoListView->setSelectionModel(m_itemSelcModel);
 
     // listNamesView
     m_listNamesModel = new QStandardItemModel(this);
@@ -332,7 +315,6 @@ MainWindow::MainWindow(QWidget *parent)
     initConnect();
     initLists();
     disableTaskDetailsUi();
-    clearTaskDetailsUiContent();
 }
 
 MainWindow::~MainWindow()

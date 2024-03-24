@@ -16,12 +16,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    QStandardItemModel* m_itemModel;
-    QItemSelectionModel* m_itemSelcModel;
     QStandardItemModel* m_listNamesModel;
     QItemSelectionModel* m_listNameSelcModel;
     QHash<QString, TaskListModel*> m_nameToListMap;
-    QStandardItem* m_beingModifiedItem = nullptr;
     TaskListModel* m_taskListModel;
     QItemSelectionModel* m_taskListSelcModel;
 
@@ -29,8 +26,6 @@ private:
     void initLists();
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
-    void clearTaskDetailsUiContent();
-    QStandardItem* beingModifiedItem();
 
 private slots:
     void onAddItemBtnClicked();
