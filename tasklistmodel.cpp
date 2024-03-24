@@ -124,3 +124,10 @@ void TaskListModel::addTask(QString taskName)
     m_taskList.append(Task(taskName));
     endInsertRows();
 }
+
+void TaskListModel::removeTask(const QModelIndex &index)
+{
+    beginRemoveRows(QModelIndex(), index.row(), index.row());
+    m_taskList.removeAt(index.row());
+    endRemoveRows();
+}

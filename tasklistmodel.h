@@ -15,6 +15,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     void addTask(QString taskName);
+    void removeTask(const QModelIndex& index);
 
 private:
     QList<Task> m_taskList;
