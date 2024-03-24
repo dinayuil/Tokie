@@ -63,12 +63,47 @@ bool TaskListModel::setData(const QModelIndex &index, const QVariant &value, int
     {
         return false;
     }
-    if ( role == Qt::DisplayRole)
+
+    int row = index.row();
+    assert(row < m_taskList.count());
+
+    switch ( role )
     {
-        int row = index.row();
-        assert(row < m_taskList.count());
+    case Qt::DisplayRole:
+    {
         m_taskList[row].setName(value.toString());
         return true;
+    }
+    case TaskEnableDueRole:
+    {
+        m_taskList[row].setEnableDue(value.toBool());
+        return true;
+    }
+    case TaskDueRole:
+    {
+        m_taskList[row].setDue(value.toDate());
+        return true;
+    }
+    case TaskEnableReminderRole:
+    {
+        m_taskList[row].setEnableReminder(value.toBool());
+        return true;
+    }
+    case TaskReminderRole:
+    {
+        m_taskList[row].setReminder(value.toDateTime());
+        return true;
+    }
+    case TaskCommentRole:
+    {
+        m_taskList[row].setComment(value.toString());
+        return true;
+    }
+    case TaskCompleteRole:
+    {
+        m_taskList[row].setComplete(value.toBool());
+        return true;
+    }
     }
     return false;
 }
