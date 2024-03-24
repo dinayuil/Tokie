@@ -19,7 +19,7 @@ QVariant TaskListModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    qDebug() << index.row();
+//    qDebug() << index.row();
     int row = index.row();
     assert(row < m_taskList.count());
 
