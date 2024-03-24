@@ -7,7 +7,7 @@
 
 void MainWindow::initConnect()
 {
-    /* todo list */
+    /* task list */
     connect(ui->addItemBtn, SIGNAL(clicked()), this, SLOT(onAddItemBtnClicked()));
 //    connect(m_itemSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onItemSelcChanged(QItemSelection)));
     // todo list right click menu
@@ -34,16 +34,10 @@ void MainWindow::initConnect()
 
 void MainWindow::onAddItemBtnClicked()
 {
-    QString newTodo = ui->newTodoEdit->text();
-    if(!newTodo.isEmpty())
+    QString newTaskName = ui->newTodoEdit->text();
+    if(!newTaskName.isEmpty())
     {
-        QStandardItem* item = new QStandardItem(newTodo);
-        Task* task = new Task(newTodo);     // TODO: how to delete, manually, smart pointer or use QObject ?
-        QVariant variant;
-        variant.setValue(task);
-        item->setData(variant);
-        item->setCheckable(true);
-        m_itemModel->appendRow(item);
+        m_taskListModel->addTask(newTaskName);
         ui->newTodoEdit->clear();
     }
 }
@@ -330,7 +324,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
     ui->taskListView->setModel(m_taskListModel);
     ui->taskListView->setSelectionModel(m_taskListSelcModel);
-    m_taskListModel->addTask("aa");
 
 
     initConnect();
