@@ -81,6 +81,8 @@ bool TaskListModel::setData(const QModelIndex &index, const QVariant &value, int
     }
     case TaskDueRole:
     {
+        qDebug() << "setData Due row: " << row;
+        qDebug() << value.toDate();
         m_taskList[row].setDue(value.toDate());
         return true;
     }
@@ -91,6 +93,8 @@ bool TaskListModel::setData(const QModelIndex &index, const QVariant &value, int
     }
     case TaskReminderRole:
     {
+        qDebug() << "setData Reminder row: " << row;
+        qDebug() << value.toDateTime();
         m_taskList[row].setReminder(value.toDateTime());
         return true;
     }

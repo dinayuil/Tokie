@@ -26,12 +26,13 @@ void MainWindow::initConnect()
     connect(ui->taskReminderDateTimeEdit, &QDateTimeEdit::editingFinished, this, &MainWindow::onTaskReminderDateTimeEditFinished);
     connect(ui->taskDueDateEdit, &QDateEdit::editingFinished, this, &MainWindow::onTaskDueDateEditFinished);
 
-    /* lists of todo list*/
-    connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
-    connect(m_listNameSelcModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onListNameSelcChanged(QItemSelection)));
+    /* list of task lists*/
+    // add list
+    connect(ui->addListBtn, &QPushButton::clicked, this, &MainWindow::onAddListBtnClicked);
+    connect(m_listNameSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onListNameSelcChanged);
     // lists right click menu
-    connect(ui->listNamesView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickListName()));
-    connect(ui->actionDeleteList, SIGNAL(triggered(bool)), this, SLOT(onActDeleteList()));
+    connect(ui->listNamesView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInListName);
+    connect(ui->actionDeleteList, &QAction::triggered, this, &MainWindow::onActDeleteList);
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -46,17 +47,14 @@ void MainWindow::onAddItemBtnClicked()
 
 void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
 {
-    QModelIndexList selectedIndexes = selected.indexes();
-    for(int i = 0; i < selectedIndexes.size(); i++)
+    QModelIndexList indexes = selected.indexes();
+    if(!indexes.empty() && indexes[0].isValid())
     {
-
-        qDebug() << m_listNamesModel->data(selectedIndexes[i]).toString();
-
-        m_itemModel = m_nameToListMap[m_listNamesModel->data(selectedIndexes[i]).toString()];
-        ui->todoListView->setModel(m_itemModel);
-
-        m_itemSelcModel->setModel(m_itemModel);
-        ui->todoListView->setSelectionModel(m_itemSelcModel);
+        qDebug() << m_listNamesModel->data(indexes[0]).toString();
+        m_taskListModel = m_nameToListMap[m_listNamesModel->data(indexes[0]).toString()];
+        m_taskListSelcModel->setModel(m_taskListModel);
+        ui->taskListView->setModel(m_taskListModel);
+        ui->taskListView->setSelectionModel(m_taskListSelcModel);
 
         disableTaskDetailsUi();
     }
@@ -79,19 +77,13 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
         ui->taskReminderChkBox->setChecked(enableReminder);
 
         if(enableReminder)
-        {
-            QDateTime reminder = m_taskListModel->data(index, TaskReminderRole).toDateTime();
-            if(reminder.isValid()) ui->taskReminderDateTimeEdit->setDateTime(reminder);
-        }
+            ui->taskReminderDateTimeEdit->setDateTime(m_taskListModel->data(index, TaskReminderRole).toDateTime());
 
         bool enableDue = m_taskListModel->data(index, TaskEnableDueRole).toBool();
         ui->taskDueChkBox->setChecked(enableDue);
 
         if(enableDue)
-        {
-            QDate due = m_taskListModel->data(index, TaskDueRole).toDate();
-            if(due.isValid()) ui->taskDueDateEdit->setDate(due);
-        }
+            ui->taskDueDateEdit->setDate(m_taskListModel->data(index, TaskDueRole).toDate());
 
         ui->taskCommentTextEdit->setText(m_taskListModel->data(index, TaskCommentRole).toString());
 
@@ -153,36 +145,33 @@ void MainWindow::onAddListBtnClicked()
     {
         QStandardItem* item = new QStandardItem(listName);
         m_listNamesModel->appendRow(item);
-        m_nameToListMap[listName] = new QStandardItemModel(this);
-        m_nameToListMap[listName]->setColumnCount(1);
+        m_nameToListMap[listName] = new TaskListModel(this);
     }
 
 }
 
-void MainWindow::onRightClickListName()
+void MainWindow::onRightClickInListName(const QPoint &pos)
 {
-    QMenu* menuList= new QMenu(this);
-    menuList->addAction(ui->actionDeleteList);
-    if(!m_listNameSelcModel->currentIndex().isValid())
+    if(ui->listNamesView->indexAt(pos).isValid())
     {
-        ui->actionDeleteList->setEnabled(false);
+        QMenu* menuList = new QMenu(this);
+        menuList->addAction(ui->actionDeleteList);
+        menuList->exec(QCursor::pos());
+        delete menuList;
     }
-    else
-    {
-        ui->actionDeleteList->setEnabled(true);
-    }
-    menuList->exec(QCursor::pos());
-    delete menuList;
 }
 
 void MainWindow::onActDeleteList()
 {
-    int currentRow = m_listNameSelcModel->currentIndex().row();
-    QStandardItem* listNameItem = m_listNamesModel->item(currentRow);
-    QStandardItemModel* todoItemModel = m_nameToListMap[listNameItem->text()];
-    delete todoItemModel;   // call the model's destructor, and also destroys all its items
-    m_nameToListMap.remove(listNameItem->text());
-    m_listNamesModel->removeRow(currentRow);
+    QModelIndexList indexes = m_listNameSelcModel->selectedIndexes();
+    if(!indexes.empty() && indexes[0].isValid())
+    {
+        QString listName = m_listNamesModel->data(indexes[0]).toString();
+        TaskListModel* taskListModel = m_nameToListMap[listName];
+        delete taskListModel;
+        m_listNamesModel->removeRow(indexes[0].row());
+        m_nameToListMap.remove(listName);
+    }
 }
 
 void MainWindow::onTaskReminderChkBoxToggled(bool checked)
@@ -192,17 +181,44 @@ void MainWindow::onTaskReminderChkBoxToggled(bool checked)
     {
         m_taskListModel->setData(indexes[0], QVariant(checked), TaskEnableReminderRole);
         ui->taskReminderDateTimeEdit->setEnabled(checked);
+        if(checked)
+        {
+            QDateTime reminder = m_taskListModel->data(indexes[0], TaskReminderRole).toDateTime();
+            if(!reminder.isValid())
+            {
+                reminder = ui->taskReminderDateTimeEdit->dateTime();
+                m_taskListModel->setData(indexes[0], QVariant(reminder), TaskReminderRole);
+            }
+            ui->taskReminderDateTimeEdit->setDateTime(reminder);
+        }
+        else
+        {
+            m_taskListModel->setData(indexes[0], QVariant(), TaskReminderRole);
+        }
     }
 }
 
 void MainWindow::onTaskDueChkBoxToggled(bool checked)
 {
-
     QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
     if(!indexes.empty() && indexes[0].isValid())
     {
         m_taskListModel->setData(indexes[0], QVariant(checked), TaskEnableDueRole);
         ui->taskDueDateEdit->setEnabled(checked);
+        if(checked)
+        {
+            QDate due = m_taskListModel->data(indexes[0], TaskDueRole).toDate();
+            if(!due.isValid())
+            {
+                due = ui->taskDueDateEdit->date();
+                m_taskListModel->setData(indexes[0], QVariant(due), TaskDueRole);
+            }
+            ui->taskDueDateEdit->setDate(due);
+        }
+        else
+        {
+            m_taskListModel->setData(indexes[0], QVariant(), TaskDueRole);
+        }
     }
 }
 
@@ -225,6 +241,7 @@ void MainWindow::onTaskReminderDateTimeEditFinished()
     QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
     if(!indexes.empty() && indexes[0].isValid())
     {
+        qDebug() << "reminder edit finish, row: " << indexes[0].row();
         QDateTime dateTime = ui->taskReminderDateTimeEdit->dateTime();
         if(dateTime.isValid())
         {
@@ -238,6 +255,7 @@ void MainWindow::onTaskDueDateEditFinished()
     QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
     if(!indexes.empty() && indexes[0].isValid())
     {
+        qDebug() << "due edit finish, row: " << indexes[0].row();
         QDate date = ui->taskDueDateEdit->date();
         if(date.isValid())
         {
@@ -249,27 +267,6 @@ void MainWindow::onTaskDueDateEditFinished()
 void MainWindow::initLists()
 {
     // in the future they should be loaded from disk
-    QList<QString> allListNames;
-    allListNames<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南";
-    for(const auto& name: allListNames)
-    {
-        m_nameToListMap[name] = new QStandardItemModel(this);
-        m_nameToListMap[name]->setColumnCount(1);
-    }
-
-    for(const auto& name: allListNames)
-    {
-        QStandardItem* item = new QStandardItem(name);
-        m_listNamesModel->appendRow(item);
-    }
-
-
-    for(long i = 0; i < 15; i++)
-    {
-        QStandardItem* item = new QStandardItem(QString::number(i));
-        item->setCheckable(true);
-        m_itemModel->appendRow(item);
-    }
 
 }
 

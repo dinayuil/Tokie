@@ -20,7 +20,7 @@ private:
     QItemSelectionModel* m_itemSelcModel;
     QStandardItemModel* m_listNamesModel;
     QItemSelectionModel* m_listNameSelcModel;
-    QHash<QString, QStandardItemModel*> m_nameToListMap;
+    QHash<QString, TaskListModel*> m_nameToListMap;
     QStandardItem* m_beingModifiedItem = nullptr;
     TaskListModel* m_taskListModel;
     QItemSelectionModel* m_taskListSelcModel;
@@ -39,7 +39,7 @@ private slots:
     void onActDeleteItem();
     void onRightClickInTodoList(const QPoint &pos);
     void onAddListBtnClicked();
-    void onRightClickListName();
+    void onRightClickInListName(const QPoint &pos);
     void onActDeleteList();
     void onTaskReminderChkBoxToggled(bool checked);
     void onTaskDueChkBoxToggled(bool checked);
