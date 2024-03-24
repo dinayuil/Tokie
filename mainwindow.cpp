@@ -21,7 +21,7 @@ void MainWindow::initConnect()
 
     /* Task details UI */
     connect(ui->taskNameLineEdit, &QLineEdit::editingFinished, this, &MainWindow::onTaskNameLineEditFinished);
-    connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
+    connect(ui->taskReminderChkBox, &QCheckBox::toggled, this, &MainWindow::onTaskReminderChkBoxToggled);
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
     connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
     connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
@@ -186,12 +186,11 @@ void MainWindow::onActDeleteList()
 
 void MainWindow::onTaskReminderChkBoxToggled(bool checked)
 {
-    ui->taskReminderDateTimeEdit->setEnabled(checked);
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
+    if(!indexes.empty() && indexes[0].isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
-        task->setEnableReminder(checked);
+        m_taskListModel->setData(indexes[0], QVariant(checked), TaskEnableReminderRole);
+        ui->taskReminderDateTimeEdit->setEnabled(checked);
     }
 }
 
