@@ -24,7 +24,7 @@ void MainWindow::initConnect()
     connect(ui->taskReminderChkBox, &QCheckBox::toggled, this, &MainWindow::onTaskReminderChkBoxToggled);
     connect(ui->taskDueChkBox, &QCheckBox::toggled, this, &MainWindow::onTaskDueChkBoxToggled);
     connect(ui->taskReminderDateTimeEdit, &QDateTimeEdit::editingFinished, this, &MainWindow::onTaskReminderDateTimeEditFinished);
-    connect(ui->taskDueDateEdit, SIGNAL(editingFinished()), this, SLOT(onTaskDueDateEditFinished()));
+    connect(ui->taskDueDateEdit, &QDateEdit::editingFinished, this, &MainWindow::onTaskDueDateEditFinished);
 
     /* lists of todo list*/
     connect(ui->addListBtn, SIGNAL(clicked()), this, SLOT(onAddListBtnClicked()));
@@ -235,14 +235,13 @@ void MainWindow::onTaskReminderDateTimeEditFinished()
 
 void MainWindow::onTaskDueDateEditFinished()
 {
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();
-    if(!indexes.empty())
+    QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();
+    if(!indexes.empty() && indexes[0].isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
         QDate date = ui->taskDueDateEdit->date();
         if(date.isValid())
         {
-            task->setDue(date);
+            m_taskListModel->setData(indexes[0], QVariant(date), TaskDueRole);
         }
     }
 }
