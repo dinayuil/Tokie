@@ -20,7 +20,7 @@ void MainWindow::initConnect()
 
 
     /* Task details UI */
-    connect(ui->taskNameLineEdit, SIGNAL(editingFinished()), this, SLOT(onTaskNameLineEditFinished()));
+    connect(ui->taskNameLineEdit, &QLineEdit::editingFinished, this, &MainWindow::onTaskNameLineEditFinished);
     connect(ui->taskReminderChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskReminderChkBoxToggled(bool)));
     connect(ui->taskDueChkBox, SIGNAL(toggled(bool)), this, SLOT(onTaskDueChkBoxToggled(bool)));
     connect(ui->taskReminderDateTimeEdit, SIGNAL(editingFinished()), this, SLOT(onTaskReminderDateTimeEditFinished()));
@@ -208,17 +208,15 @@ void MainWindow::onTaskDueChkBoxToggled(bool checked)
 
 void MainWindow::onTaskNameLineEditFinished()
 {
-    QModelIndexList indexes = m_itemSelcModel->selectedIndexes();   // this will still get the index for the item that is being modified, not the next selected item
-    if(!indexes.empty())
+    QModelIndexList indexes = m_taskListSelcModel->selectedIndexes();   // this will still get the index for the item that is being modified, not the next selected item
+    if(!indexes.empty() && indexes[0].isValid())
     {
-        Task* task = m_itemModel->data(indexes[0], Qt::UserRole+1).value<Task*>();
         QString newName = ui->taskNameLineEdit->text();
         if(!newName.isEmpty())
         {
-            task->setName(newName);
-            m_itemModel->setData(indexes[0], newName, Qt::DisplayRole);
+            m_taskListModel->setData(indexes[0], QVariant(newName), Qt::DisplayRole);
+            qDebug() << "onTaskNameLineEditFinished: " << newName;
         }
-        qDebug() << "onTaskNameLineEditFinished: " << newName;
     }
 }
 
