@@ -13,9 +13,8 @@ void MainWindow::initConnect()
     connect(ui->addItemBtn, &QPushButton::clicked, this, &MainWindow::onAddItemBtnClicked);
     // selection change
     connect(m_taskListSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onItemSelcChanged);
-
     // todo list right click menu
-    connect(ui->todoListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onRightClickInTodoList(QPoint)));
+    connect(ui->taskListView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInTodoList);
     connect(ui->actionDeleteItem, SIGNAL(triggered()), this, SLOT(onActDeleteItem()));
 
 
@@ -109,7 +108,7 @@ void MainWindow::onActDeleteItem()
 
 void MainWindow::onRightClickInTodoList(const QPoint &pos)
 {
-    if(ui->todoListView->indexAt(pos).isValid())
+    if(ui->taskListView->indexAt(pos).isValid())
     {
         QMenu* menuList= new QMenu(this);
         menuList->addAction(ui->actionDeleteItem);
@@ -309,8 +308,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->todoListView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->taskListView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // todoListView
     m_itemModel = new QStandardItemModel(this);
