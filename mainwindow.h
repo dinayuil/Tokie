@@ -41,6 +41,7 @@ private slots:
     void onTaskNameLineEditFinished();
     void onTaskReminderDateTimeEditFinished();
     void onTaskDueDateEditFinished();
+    void onListNamesRowsInserted();
 
 public:
     MainWindow(QWidget *parent = nullptr);

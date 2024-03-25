@@ -29,10 +29,15 @@ void MainWindow::initConnect()
     /* list of task lists*/
     // add list
     connect(ui->addListBtn, &QPushButton::clicked, this, &MainWindow::onAddListBtnClicked);
+    // selection change
     connect(m_listNameSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onListNameSelcChanged);
     // lists right click menu
     connect(ui->listNamesView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInListName);
+    // remove list
     connect(ui->actionDeleteList, &QAction::triggered, this, &MainWindow::onActDeleteList);
+    // when list added/removed
+    connect(m_listNamesModel, &QStandardItemModel::rowsInserted, this, &MainWindow::onListNamesRowsInserted);
+    connect(m_listNamesModel, &QStandardItemModel::rowsRemoved, this, &MainWindow::onListNamesRowsRemoved);
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -50,12 +55,13 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
     QModelIndexList indexes = selected.indexes();
     if(!indexes.empty() && indexes[0].isValid())
     {
-        qDebug() << m_listNamesModel->data(indexes[0]).toString();
-        m_taskListModel = m_nameToListMap[m_listNamesModel->data(indexes[0]).toString()];
+        QString listName = m_listNamesModel->data(indexes[0]).toString();
+        qDebug() << listName;
+        m_taskListModel = m_nameToListMap[listName];
         m_taskListSelcModel->setModel(m_taskListModel);
         ui->taskListView->setModel(m_taskListModel);
         ui->taskListView->setSelectionModel(m_taskListSelcModel);
-
+        ui->listNameLabel->setText(listName);
         disableTaskDetailsUi();
     }
 }
@@ -264,6 +270,22 @@ void MainWindow::onTaskDueDateEditFinished()
     }
 }
 
+void MainWindow::onListNamesRowsInserted()
+{
+    if(m_listNamesModel->rowCount() > 0)
+    {
+        ui->taskListView->setEnabled(true);
+    }
+}
+
+void MainWindow::onListNamesRowsRemoved()
+{
+    if(m_listNamesModel->rowCount() == 0)
+    {
+        ui->taskListView->setEnabled(false);
+    }
+}
+
 void MainWindow::initLists()
 {
     // in the future they should be loaded from disk
@@ -306,7 +328,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
     // taskListView
-    m_taskListModel = new TaskListModel(this);
+    // TODO: will be loaded from file
+    // if empty list then create a list
+    m_nameToListMap["my day"] = new TaskListModel(this);
+    m_listNamesModel->appendRow(new QStandardItem("my day"));
+    m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
+    m_taskListModel = m_nameToListMap["my day"];
     m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
     ui->taskListView->setModel(m_taskListModel);
     ui->taskListView->setSelectionModel(m_taskListSelcModel);
