@@ -74,19 +74,6 @@
        <string>Add item</string>
       </property>
      </widget>
-     <widget class="QListView" name="todoListView">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>110</y>
-        <width>221</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <property name="editTriggers">
-       <set>QAbstractItemView::NoEditTriggers</set>
-      </property>
-     </widget>
      <widget class="QLabel" name="listNameLabel">
       <property name="geometry">
        <rect>
@@ -104,9 +91,9 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>280</y>
+        <y>100</y>
         <width>221</width>
-        <height>111</height>
+        <height>291</height>
        </rect>
       </property>
       <property name="editTriggers">
