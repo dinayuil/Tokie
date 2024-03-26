@@ -30,9 +30,12 @@ public:
     bool complete() const;
     void setComplete(bool newComplete);
 
+    friend QDataStream& operator<<(QDataStream&, const Task&);
+    friend QDataStream& operator>>(QDataStream&, Task&);
+
 private:
     static long s_startId;
-    long m_id;
+    qint64 m_id;
     bool m_enableReminder = false;
     QDateTime m_reminder;
     bool m_enableDue = false;
@@ -42,6 +45,6 @@ private:
     bool m_complete = false;
 };
 
-Q_DECLARE_METATYPE(Task *);
+//Q_DECLARE_METATYPE(Task *);
 
 #endif // TASK_H

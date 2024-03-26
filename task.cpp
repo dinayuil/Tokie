@@ -82,3 +82,29 @@ void Task::setComplete(bool newComplete)
 {
     m_complete = newComplete;
 }
+
+QDataStream& operator<<(QDataStream& out, const Task& task)
+{
+    out << task.m_id;
+    out << task.m_enableReminder;
+    out << task.m_reminder;
+    out << task.m_enableDue;
+    out << task.m_due;
+    out << task.m_comment;
+    out << task.m_name;
+    out << task.m_complete;
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, Task& task)
+{
+    in >> task.m_id;
+    in >> task.m_enableReminder;
+    in >> task.m_reminder;
+    in >> task.m_enableDue;
+    in >> task.m_due;
+    in >> task.m_comment;
+    in >> task.m_name;
+    in >> task.m_complete;
+    return in;
+}
