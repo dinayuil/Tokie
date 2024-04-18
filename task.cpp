@@ -1,16 +1,7 @@
 #include "task.h"
 
-long Task::s_startId=-1;
-
-Task::Task(QString name):
-    m_name(name)
+Task::Task()
 {
-    if(s_startId == -1)
-    {
-        s_startId = 1;
-    }
-    m_id = s_startId;
-    s_startId++;
 }
 
 QString Task::name() const
@@ -85,7 +76,6 @@ void Task::setComplete(bool newComplete)
 
 QDataStream& operator<<(QDataStream& out, const Task& task)
 {
-    out << task.m_id;
     out << task.m_enableReminder;
     out << task.m_reminder;
     out << task.m_enableDue;
@@ -98,7 +88,6 @@ QDataStream& operator<<(QDataStream& out, const Task& task)
 
 QDataStream& operator>>(QDataStream& in, Task& task)
 {
-    in >> task.m_id;
     in >> task.m_enableReminder;
     in >> task.m_reminder;
     in >> task.m_enableDue;

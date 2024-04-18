@@ -1,8 +1,11 @@
 #include "tasklistmodel.h"
 #include "TaskDataRoles.h"
+#include <QFile>
 
-TaskListModel::TaskListModel(QObject *parent)
-    : QAbstractListModel{parent}
+
+TaskListModel::TaskListModel(QString listName, QObject *parent)
+    : m_listName(listName),
+    QAbstractListModel{parent}
 {
 
 }
@@ -125,7 +128,9 @@ Qt::ItemFlags TaskListModel::flags(const QModelIndex &index) const
 void TaskListModel::addTask(QString taskName)
 {
     beginInsertRows(QModelIndex(), m_taskList.size(), m_taskList.size());
-    m_taskList.append(Task(taskName));
+    Task task;
+    task.setName(taskName);
+    m_taskList.append(task);
     endInsertRows();
 }
 
@@ -134,4 +139,27 @@ void TaskListModel::removeTask(const QModelIndex &index)
     beginRemoveRows(QModelIndex(), index.row(), index.row());
     m_taskList.removeAt(index.row());
     endRemoveRows();
+}
+
+void TaskListModel::saveModel()
+{
+
+    QFile file("data/" + m_listName+".dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    for(const auto& task : m_taskList)
+    {
+        out << task;
+    }
+    file.close();
+}
+
+void TaskListModel::loadModel(QDataStream &in)
+{
+    while(!in.atEnd())
+    {
+        Task task;
+        in >> task;
+        m_taskList.append(task);
+    }
 }

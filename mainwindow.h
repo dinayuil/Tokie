@@ -26,6 +26,7 @@ private:
     void initLists();
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
+    void loadData();
 
 private slots:
     void onAddItemBtnClicked();

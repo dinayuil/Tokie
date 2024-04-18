@@ -7,7 +7,7 @@
 class Task
 {
 public:
-    Task(QString name);
+    Task();
 
     QString name() const;
     void setName(const QString &newName);
@@ -34,8 +34,6 @@ public:
     friend QDataStream& operator>>(QDataStream&, Task&);
 
 private:
-    static long s_startId;
-    qint64 m_id;
     bool m_enableReminder = false;
     QDateTime m_reminder;
     bool m_enableDue = false;
