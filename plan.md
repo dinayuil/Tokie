@@ -1,5 +1,5 @@
 # Doing
-持久化数据
+重命名列表
 
 # functional requirements
 [x] 向添加item
@@ -15,8 +15,9 @@
 [] 重命名列表
 [] item设置重复间隔
 [x] 点击list内没有task的地方应该不出现contextMenu
-[] 持久化数据
+[x] 持久化数据
 [x] 更换列表后task details disabled
+[] reminder系统提醒
 
 # non-functional requirements
 [] 勾选item后item移动到已完成
