@@ -318,32 +318,16 @@ void MainWindow::disableTaskDetailsUi()
 
 void MainWindow::loadData()
 {
-    if(QFileInfo::exists("data"))
-    {
-        QDir dir("data");
-        QStringList files = dir.entryList(QDir::Files);
-        for(const auto& fileName : files)
-        {
-            QString listName = fileName.left(fileName.length()-4);
-            m_nameToListMap[listName] = new TaskListModel(listName, this);
-
-            QFile file("data/"+fileName);
-            file.open(QIODevice::ReadOnly);
-            QDataStream in(&file);
-            m_nameToListMap[listName]->loadModel(in);
-            file.close();
-
-            m_listNamesModel->appendRow(new QStandardItem(listName));
-            m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
-            m_taskListModel = m_nameToListMap[listName];
-            m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
-            ui->taskListView->setModel(m_taskListModel);
-            ui->taskListView->setSelectionModel(m_taskListSelcModel);
-        }
-    }
-    else
+    bool dataExists = false;
+    QDir dir("data");
+    if(!dir.exists())
     {
         QDir().mkdir("data");
+    }
+
+    QStringList files = dir.entryList(QDir::Files);
+    if(files.empty())
+    {
         m_nameToListMap["my day"] = new TaskListModel("my day", this);
         m_listNamesModel->appendRow(new QStandardItem("my day"));
         m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
@@ -351,8 +335,35 @@ void MainWindow::loadData()
         m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
         ui->taskListView->setModel(m_taskListModel);
         ui->taskListView->setSelectionModel(m_taskListSelcModel);
+        return;
     }
 
+    for(const QString& fileName : files)
+    {
+        QString fileExtension = fileName.right(4);
+        if(fileExtension != ".dat")
+        {
+            continue;
+        }
+
+        QString listName = fileName.left(fileName.lastIndexOf("."));
+        m_nameToListMap[listName] = new TaskListModel(listName, this);
+
+        // load data from file to list model
+        QFile file("data/"+fileName);
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        m_nameToListMap[listName]->loadModel(in);
+        file.close();
+
+        m_listNamesModel->appendRow(new QStandardItem(listName));
+    }
+
+    m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
+    m_taskListModel = m_nameToListMap[m_listNamesModel->item(0)->data(Qt::DisplayRole).toString()];
+    m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
+    ui->taskListView->setModel(m_taskListModel);
+    ui->taskListView->setSelectionModel(m_taskListSelcModel);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -371,8 +382,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
     // taskListView
-    // TODO: will be loaded from file
-    // if empty list then create a list
+
     loadData();
 
 
