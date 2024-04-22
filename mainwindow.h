@@ -22,12 +22,12 @@ private:
     TaskListModel* m_taskListModel;
     QItemSelectionModel* m_taskListSelcModel;
 
-    void initConnect();
+    void initUiConnect();
     void initLists();
     void enableTaskDetailsUi();
     void disableTaskDetailsUi();
     void loadData();
-
+    void selectListAtStart();
 private slots:
     void onAddItemBtnClicked();
     void onListNameSelcChanged(const QItemSelection &selected);
@@ -44,6 +44,7 @@ private slots:
     void onTaskDueDateEditFinished();
     void onListNamesRowsInserted();
     void onListNamesRowsRemoved();
+    void onListNameLineEditFinished();
 
 public:
     MainWindow(QWidget *parent = nullptr);

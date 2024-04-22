@@ -8,13 +8,11 @@
 #include <QFileInfo>
 #include <QDir>
 
-void MainWindow::initConnect()
+void MainWindow::initUiConnect()
 {
     /* task list */
     // add task
     connect(ui->addItemBtn, &QPushButton::clicked, this, &MainWindow::onAddItemBtnClicked);
-    // selection change
-    connect(m_taskListSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onItemSelcChanged);
     // task list right click menu
     connect(ui->taskListView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInTodoList);
     // context menu: delete
@@ -31,15 +29,12 @@ void MainWindow::initConnect()
     /* list of task lists*/
     // add list
     connect(ui->addListBtn, &QPushButton::clicked, this, &MainWindow::onAddListBtnClicked);
-    // selection change
-    connect(m_listNameSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onListNameSelcChanged);
     // lists right click menu
     connect(ui->listNamesView, &QListView::customContextMenuRequested, this, &MainWindow::onRightClickInListName);
     // remove list
     connect(ui->actionDeleteList, &QAction::triggered, this, &MainWindow::onActDeleteList);
-    // when list added/removed
-    connect(m_listNamesModel, &QStandardItemModel::rowsInserted, this, &MainWindow::onListNamesRowsInserted);
-    connect(m_listNamesModel, &QStandardItemModel::rowsRemoved, this, &MainWindow::onListNamesRowsRemoved);
+    // list rename
+    connect(ui->listNameLineEdit, &QLineEdit::editingFinished, this, &MainWindow::onListNameLineEditFinished);
 }
 
 void MainWindow::onAddItemBtnClicked()
@@ -65,7 +60,7 @@ void MainWindow::onListNameSelcChanged(const QItemSelection &selected)
         m_taskListSelcModel->setModel(m_taskListModel);
         ui->taskListView->setModel(m_taskListModel);
         ui->taskListView->setSelectionModel(m_taskListSelcModel);
-        ui->listNameLabel->setText(listName);
+        ui->listNameLineEdit->setText(listName);
         disableTaskDetailsUi();
     }
 }
@@ -290,6 +285,17 @@ void MainWindow::onListNamesRowsRemoved()
     }
 }
 
+void MainWindow::onListNameLineEditFinished()
+{
+    QString newListName = ui->listNameLineEdit->text();
+    QModelIndexList indexes = m_listNameSelcModel->selectedIndexes();
+    QString listName = m_listNamesModel->itemFromIndex(indexes[0])->text();
+    if(newListName != listName)
+    {
+        m_listNamesModel->setItemData(indexes[0], QMap<int, QVariant>({{Qt::DisplayRole,QVariant(newListName)}}));
+    }
+}
+
 void MainWindow::initLists()
 {
     // in the future they should be loaded from disk
@@ -330,11 +336,6 @@ void MainWindow::loadData()
     {
         m_nameToListMap["my day"] = new TaskListModel("my day", this);
         m_listNamesModel->appendRow(new QStandardItem("my day"));
-        m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
-        m_taskListModel = m_nameToListMap["my day"];
-        m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
-        ui->taskListView->setModel(m_taskListModel);
-        ui->taskListView->setSelectionModel(m_taskListSelcModel);
         return;
     }
 
@@ -358,12 +359,6 @@ void MainWindow::loadData()
 
         m_listNamesModel->appendRow(new QStandardItem(listName));
     }
-
-    m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
-    m_taskListModel = m_nameToListMap[m_listNamesModel->item(0)->data(Qt::DisplayRole).toString()];
-    m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
-    ui->taskListView->setModel(m_taskListModel);
-    ui->taskListView->setSelectionModel(m_taskListSelcModel);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -381,14 +376,27 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listNamesView->setModel(m_listNamesModel);
     ui->listNamesView->setSelectionModel(m_listNameSelcModel);
 
-    // taskListView
+    // when list selection change
+    connect(m_listNameSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onListNameSelcChanged);
+
+    // when list added/removed
+    connect(m_listNamesModel, &QStandardItemModel::rowsInserted, this, &MainWindow::onListNamesRowsInserted);
+    connect(m_listNamesModel, &QStandardItemModel::rowsRemoved, this, &MainWindow::onListNamesRowsRemoved);
 
     loadData();
 
+    initUiConnect();
 
+    m_taskListModel = m_nameToListMap[m_listNamesModel->item(0)->data(Qt::DisplayRole).toString()];
+    m_taskListSelcModel = new QItemSelectionModel(m_taskListModel, this);
+    ui->taskListView->setModel(m_taskListModel);
+    ui->taskListView->setSelectionModel(m_taskListSelcModel);
+    // first select when start
+    m_listNameSelcModel->select(m_listNamesModel->index(0,0), QItemSelectionModel::SelectCurrent);
 
-    initConnect();
-    initLists();
+    // when task selection change
+    connect(m_taskListSelcModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onItemSelcChanged);
+
     disableTaskDetailsUi();
 }
 
