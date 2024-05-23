@@ -17,7 +17,7 @@
 [] reminder系统提醒
 
 # bug
-[] 空列表不被保存
+[x] 空列表不被保存
 
 # non-functional requirements
 [] task reminder设置重复间隔
