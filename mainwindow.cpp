@@ -293,6 +293,18 @@ void MainWindow::onListNameLineEditFinished()
     if(newListName != listName)
     {
         m_listNamesModel->setItemData(indexes[0], QMap<int, QVariant>({{Qt::DisplayRole,QVariant(newListName)}}));
+        m_nameToListMap[listName]->setListName(newListName);
+        m_nameToListMap[newListName] = m_nameToListMap[listName];
+        m_nameToListMap.remove(listName);
+
+        m_nameToListMap[newListName]->saveModel();
+
+        QFile file("data/"+listName+".dat");
+        if(file.exists())
+        {
+            file.remove();
+        }
+
     }
 }
 
@@ -341,6 +353,8 @@ void MainWindow::loadData()
 
     for(const QString& fileName : files)
     {
+        qDebug() << "fileName: " << fileName;
+
         QString fileExtension = fileName.right(4);
         if(fileExtension != ".dat")
         {
@@ -358,6 +372,14 @@ void MainWindow::loadData()
         file.close();
 
         m_listNamesModel->appendRow(new QStandardItem(listName));
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for(TaskListModel* taskListModel: m_nameToListMap.values())
+    {
+        taskListModel->saveModel();
     }
 }
 

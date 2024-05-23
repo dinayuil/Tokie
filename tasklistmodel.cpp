@@ -163,3 +163,8 @@ void TaskListModel::loadModel(QDataStream &in)
         m_taskList.append(task);
     }
 }
+
+void TaskListModel::setListName(const QString &newListName)
+{
+    m_listName = newListName;
+}

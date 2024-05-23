@@ -18,6 +18,8 @@ public:
     void removeTask(const QModelIndex& index);
     void saveModel();
     void loadModel(QDataStream& in);
+    void setListName(const QString &newListName);
+
 private:
     QList<Task> m_taskList;
     QString m_listName;

@@ -28,6 +28,8 @@ private:
     void disableTaskDetailsUi();
     void loadData();
     void selectListAtStart();
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
     void onAddItemBtnClicked();
     void onListNameSelcChanged(const QItemSelection &selected);
