@@ -22,6 +22,8 @@ set(PROJECT_SOURCES
         tasklistmodel.h
         tasklistmodel.cpp
         TaskDataRoles.h
+        taskviewdelegate.h
+        taskviewdelegate.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

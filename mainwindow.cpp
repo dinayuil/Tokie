@@ -7,6 +7,7 @@
 #include "TaskDataRoles.h"
 #include <QFileInfo>
 #include <QDir>
+#include "taskviewdelegate.h"
 
 void MainWindow::initUiConnect()
 {
@@ -390,6 +391,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->listNamesView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->taskListView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->taskListView->setItemDelegate(new TaskViewDelegate(this));
 
     // listNamesView
     m_listNamesModel = new QStandardItemModel(this);
