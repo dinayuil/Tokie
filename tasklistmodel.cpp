@@ -28,7 +28,7 @@ QVariant TaskListModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
-    case Qt::DisplayRole:
+    case TaskNameRole:
     {
         return QVariant(m_taskList[row].name());
     }
@@ -72,7 +72,7 @@ bool TaskListModel::setData(const QModelIndex &index, const QVariant &value, int
 
     switch ( role )
     {
-    case Qt::DisplayRole:
+    case TaskNameRole:
     {
         m_taskList[row].setName(value.toString());
         return true;

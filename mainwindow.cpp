@@ -77,7 +77,7 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
     {
         QModelIndex index = selectedIndexes[0];
 
-        ui->taskNameLineEdit->setText(m_taskListModel->data(index, Qt::DisplayRole).toString());
+        ui->taskNameLineEdit->setText(m_taskListModel->data(index, TaskNameRole).toString());
 
         bool enableReminder = m_taskListModel->data(index, TaskEnableReminderRole).toBool();
         ui->taskReminderChkBox->setChecked(enableReminder);
@@ -95,7 +95,7 @@ void MainWindow::onItemSelcChanged(const QItemSelection &selected)
 
         enableTaskDetailsUi();
 
-        qDebug() << "onItemSelcChanged: task name: " << m_taskListModel->data(index, Qt::DisplayRole).toString();
+        qDebug() << "onItemSelcChanged: task name: " << m_taskListModel->data(index, TaskNameRole).toString();
     }
 
 }

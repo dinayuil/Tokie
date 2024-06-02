@@ -4,7 +4,8 @@
 #include "qnamespace.h"
 
 enum TaskDataRoles {
-    TaskEnableDueRole = Qt::UserRole + 1,
+    TaskNameRole = Qt::UserRole + 1,
+    TaskEnableDueRole,
     TaskDueRole,
     TaskEnableReminderRole,
     TaskReminderRole,
