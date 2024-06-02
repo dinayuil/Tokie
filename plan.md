@@ -1,5 +1,5 @@
 # Doing
-云同步
+reminder系统提醒
 
 # functional requirements
 [x] 向添加item
@@ -15,11 +15,14 @@
 [x] 持久化数据
 [x] 更换列表后task details disabled
 [] reminder系统提醒
+[x] task前面checkbox
+[] comment 保存
 
 # bug
 [x] 空列表不被保存
 
 # non-functional requirements
+[] task reminder, due 和 comment 添加 icon
 [] task reminder设置重复间隔
 [] 列表下显示已完成tasks
 [] 勾选item后item移动到已完成
